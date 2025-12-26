@@ -8,7 +8,16 @@ class Score {
      * @param {number} amount 
      */
     add(player, objective, amount) {
-        
+        player.runCommand(`scoreboard players add @s ${objective} ${amount}`)
+    }
+    set(player, objective, amount) {
+        player.runCommand(`scoreboard players set @s ${objective} ${amount}`)
+    }
+    remove(player, objective, amount) {
+        player.runCommand(`scoreboard players remove @s ${objective} ${amount}`)
+    }
+    get(player, objective) {
+        return world.scoreboard.getObjective(objective).getScore(player) ?? 0
     }
 }
 

@@ -6,8 +6,22 @@ world.beforeEvents.chatSend.subscribe(data => {
     let msg = data.message;
     let args = msg.slice(1).split(' ')
     if (msg.startsWith('!')) {
-        if (args[0] == add) {
-            Score.add(player, 'money', args[1])
+        data.cancel = true;
+        switch (args[0]) {
+            case 'add':
+                Score.add(player, args[1], args[2])
+                break;
+            case 'set':
+                Score.set(player, args[1], args[2])
+                break;
+            case 'remove':
+                Score.remove(player, args[1], args[2])
+                break;
+            case 'get':
+                Score.get(player, args[1])
+                break;
+            default:
+                break;
         }
     }
 })
