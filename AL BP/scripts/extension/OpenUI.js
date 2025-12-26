@@ -1,0 +1,37 @@
+import { world, system } from '@minecraft/server'
+import { FormCancelationReason } from '@minecraft/server-ui'
+
+
+class OpenUI {
+    /**
+     * 
+     * @param {string} tag - The entity tag that the hit entity must have for the UI to open.
+     * @param {Function} form - A callback function that will be executed to open the UI for the player.
+     */
+    entity(tag, form) {
+        world.afterEvents.entityHitEntity.subscribe(data => {
+            const entity = data.hitEntity;
+            const player = data.damagingEntity;
+            if (entity.hasTag(tag)) {
+                form(player)
+            }
+        })
+    }
+    async force(player, form, timeout = Infinity, interval = 5) {
+        const startTick = system.currentTick;
+        while (system.currentTick - startTick < timeout) {
+            const response = await form.show(player);
+            if (response.cancelationReason !== FormCancelationReason.UserBusy) {
+                return response;
+            }
+            await this.wait(interval)
+        }
+        throw new Error(`Timed out after ${timeout} ticks`)
+    }
+    wait(ticks) {
+        return new Promise((resolve) => system.runTimeout(resolve, ticks))
+    }
+}
+
+
+export default new OpenUI();
