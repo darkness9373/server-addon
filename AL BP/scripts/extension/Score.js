@@ -8,7 +8,7 @@ class Score {
      * @param {number} amount 
      */
     add(player, objective, amount) {
-        world.scoreboard.getObjective(objective).setScore(player, amount)
+        
     }
 }
 
