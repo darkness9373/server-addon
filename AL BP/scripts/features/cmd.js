@@ -21,6 +21,7 @@ world.beforeEvents.chatSend.subscribe(data => {
                 Score.get(player, args[1])
                 break;
             default:
+                player.sendMessage(`Error prefix`)
                 break;
         }
     }

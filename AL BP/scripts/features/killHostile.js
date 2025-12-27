@@ -7,8 +7,9 @@ world.afterEvents.entityDie.subscribe(data => {
     const dead = data.deadEntity;
     let family = dead.getComponent(EntityComponentTypes.TypeFamily)
     if (killer instanceof Player) {
+        killer.sendMessage('kill mob')
         if (family.hasTypeFamily('monster')) {
-            killer.sendMessage('kill')
+            killer.sendMessage('kill monster')
         }
     }
 })
