@@ -8,13 +8,17 @@ class Score {
      * @param {number} amount 
      */
     add(player, objective, amount) {
-        player.runCommand(`scoreboard players add @s ${objective} ${amount}`)
+        this.set(player, objective, this.get(player, objective) + amount)
     }
     set(player, objective, amount) {
-        player.runCommand(`scoreboard players set @s ${objective} ${amount}`)
+        let obj = world.scoreboard.getObjective(objective)
+        if (!obj) {
+            world.scoreboard.addObjective(objective)
+        }
+        obj.setScore(player, amount)
     }
     remove(player, objective, amount) {
-        player.runCommand(`scoreboard players remove @s ${objective} ${amount}`)
+        this.set(player, objective, this.get(player, objective) - amount)
     }
     get(player, objective) {
         return world.scoreboard.getObjective(objective).getScore(player) ?? 0
