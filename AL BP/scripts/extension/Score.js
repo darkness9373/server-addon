@@ -8,6 +8,10 @@ class Score {
      * @param {number} amount 
      */
     add(entity, objective, amount) {
+        let obj = world.scoreboard.getObjective(objective)
+        if (!obj) {
+            world.scoreboard.addObjective(objective)
+        }
         system.run(() => {
             return world.scoreboard.getObjective(objective).addScore(entity, amount)
         })
@@ -21,16 +25,30 @@ class Score {
     get(entity, objective) {
         return world.scoreboard.getObjective(objective).getScore(entity) ?? 0
     }
+    /**
+     * @param {Entity} entity
+     * @param {string} objective
+     * @param {number} amount
+     */
     remove(entity, objective, amount) {
         system.run(() => {
             return world.scoreboard.getObjective(objective).setScore(entity, this.get(entity, objective) - amount)
         })
     }
+    /**
+     * @param {Entity} entity
+     * @param {string} objective
+     */
     reset(entity, objective) {
         system.run(() => {
             return world.scoreboard.getObjective(objective).removeParticipant(entity)
         })
     }
+    /**
+     * @param {Entity} entity
+     * @param {string} objective
+     * @param {number} amount
+     */
     set(entity, objective, amount) {
         system.run(() => {
             return world.scoreboard.getObjective(objective).setScore(entity, amount)

@@ -1,3 +1,3 @@
-import './killHostile'
+import './kill'
 import './cmd'
 import './objective'

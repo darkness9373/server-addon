@@ -1,4 +1,4 @@
-import { world } from '@minecraft/server'
+import { world, system } from '@minecraft/server'
 import Score from '../extension/Score'
 
 world.beforeEvents.chatSend.subscribe(data => {
@@ -9,16 +9,20 @@ world.beforeEvents.chatSend.subscribe(data => {
         data.cancel = true;
         switch (args[0]) {
             case 'add':
-                Score.add(player, args[1], args[2])
+                if (!player.hasTag('admin')) return noAdmin(player)
+                Score.add(player, args[1], Number(args[2]))
                 break;
             case 'set':
-                Score.set(player, args[1], args[2])
+                if (!player.hasTag('admin')) return noAdmin(player)
+                Score.set(player, args[1], Number(args[2]))
                 break;
             case 'remove':
-                Score.remove(player, args[1], args[2])
+                if (!player.hasTag('admin')) return noAdmin(player)
+                Score.remove(player, args[1], Number(args[2]))
                 break;
             case 'get':
-                Score.get(player, args[1])
+                if (!player.hasTag('admin')) return noAdmin(player)
+                player.sendMessage(`${Score.get(player, args[1])}`)
                 break;
             default:
                 player.sendMessage(`Error prefix`)
@@ -26,3 +30,8 @@ world.beforeEvents.chatSend.subscribe(data => {
         }
     }
 })
+
+
+function noAdmin(player) {
+    player.sendMessage(`§cMenu ini hanya bisa digunakan oleh Admin!!`)
+}
