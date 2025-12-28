@@ -1,40 +1,41 @@
-import { world, Entity, Player } from '@minecraft/server'
+import { world, Entity, system } from '@minecraft/server'
 
 class Score {
     /**
      * 
-     * @param {Player} player 
+     * @param {Entity} entity 
      * @param {string} objective 
      * @param {number} amount 
      */
-    add(player, objective, amount) {
-        this.set(player, objective, this.get(player, objective) + amount)
+    add(entity, objective, amount) {
+        system.run(() => {
+            return world.scoreboard.getObjective(objective).addScore(entity, amount)
+        })
     }
     /**
      * 
-     * @param {Player} player 
-     * @param {string} objective 
-     * @param {number} amount 
-     */
-    set(player, objective, amount) {
-        let obj = world.scoreboard.getObjective(objective)
-        if (!obj) {
-            world.scoreboard.addObjective(objective)
-        }
-        obj.setScore(player.scoreboardIdentity, amount)
-    }
-    remove(player, objective, amount) {
-        this.set(player, objective, this.get(player, objective) - amount)
-    }
-    /**
-     * 
-     * @param {Player} player 
+     * @param {Entity} entity 
      * @param {string} objective 
      * @returns 
      */
-    get(player, objective) {
-        return world.scoreboard.getObjective(objective).getScore(player.scoreboardIdentity) ?? 0
+    get(entity, objective) {
+        return world.scoreboard.getObjective(objective).getScore(entity) ?? 0
+    }
+    remove(entity, objective, amount) {
+        system.run(() => {
+            return world.scoreboard.getObjective(objective).setScore(entity, this.get(entity, objective) - amount)
+        })
+    }
+    reset(entity, objective) {
+        system.run(() => {
+            return world.scoreboard.getObjective(objective).removeParticipant(entity)
+        })
+    }
+    set(entity, objective, amount) {
+        system.run(() => {
+            return world.scoreboard.getObjective(objective).setScore(entity, amount)
+        })
     }
 }
 
-export default new Score()
+export default new Score();
