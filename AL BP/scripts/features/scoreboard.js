@@ -2,6 +2,7 @@ import { world, system } from '@minecraft/server'
 import { PlayerDatabase } from '../extension/Database'
 import Score from '../extension/Score'
 import Extra from '../extension/Extra'
+import { playtime } from './timeplayed'
 
 
 
@@ -25,14 +26,17 @@ function getPlaceholder(text, data) {
 const board = {
     Line: [
         '@BLANK',
-        '       Nama Server',
+        '      Ya Allah lindungi Bilqis',
         '@BREAK',
         '@BLANK',
-        ' > Name    : @NAME',
-        ' > Coin    : @COIN',
-        ' > Rank    : @RANK',
-        ' > Ping    : @PINGms',
-        ' > Online  : @ONLINE player(s)',
+        ' > Name: @NAME',
+        ' > Rank: @RANK',
+        ' > Coin: @COIN',
+        ' > Ping: @PINGms',
+        ' > Kill Monster: @KILLM',
+        '@BLANK',
+        ' > Time Played: @TIMEPLAYED',
+        ' > Online: @ONLINE player(s)',
         '@BLANK',
         '@BREAK',
         '@BLANK'
@@ -56,7 +60,8 @@ system.run(function tick() {
                 Y: Math.floor(player.location.y),
                 Z: Math.floor(player.location.z),
                 KILL: Score.get(player, 'killMob'),
-                KILLM: Score.get(player, 'killMonster')
+                KILLM: Score.get(player, 'killMonster'),
+                TIMEPLAYED: playtime(Score.get(player, 'timePlayed'))
             }
         ];
         player.onScreenDisplay.setTitle(

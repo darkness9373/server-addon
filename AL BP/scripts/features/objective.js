@@ -6,4 +6,6 @@ world.afterEvents.worldLoad.subscribe(() => {
   Obj.add('moneyRaw')
   Obj.add('killMonster')
   Obj.add('killMob')
+  Obj.add('ping')
+  Obj.add('timePlayed')
 })
