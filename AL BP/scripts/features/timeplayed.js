@@ -6,7 +6,7 @@ system.run(function tick() {
     system.runTimeout(tick, 20)
 
     world.getPlayers().forEach(player => {
-        Score.add(player, 'timePlayed')
+        Score.add(player, 'timePlayed', 1)
     })
 })
 
