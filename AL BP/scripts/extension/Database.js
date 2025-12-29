@@ -30,7 +30,7 @@ export class PlayerDatabase {
      * @param {Player} player 
      */
     constructor(identifier, player) {
-        this.is = identifier;
+        this.id = identifier;
         this.player = player
     }
     /**

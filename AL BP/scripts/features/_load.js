@@ -1,3 +1,5 @@
 import './kill'
 import './cmd'
 import './objective'
+import './money'
+import './scoreboard'
