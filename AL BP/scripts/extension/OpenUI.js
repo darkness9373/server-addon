@@ -1,4 +1,4 @@
-import { world, system } from '@minecraft/server'
+import { world, system, Player } from '@minecraft/server'
 import { FormCancelationReason } from '@minecraft/server-ui'
 
 
@@ -13,10 +13,21 @@ class OpenUI {
             const entity = data.hitEntity;
             const player = data.damagingEntity;
             if (entity.hasTag(tag)) {
-                form(player)
+                system.run(() => {
+                    form(player)
+                })
             }
         })
     }
+    /**
+     * 
+     * @template T
+     * @param {Player} player 
+     * @param {{ show(player: Player): Promise<T>}} form 
+     * @param {number} timeout 
+     * @param {number} interval 
+     * @returns  {Promise<T>}
+     */
     async force(player, form, timeout = Infinity, interval = 5) {
         const startTick = system.currentTick;
         while (system.currentTick - startTick < timeout) {

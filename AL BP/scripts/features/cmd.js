@@ -1,9 +1,7 @@
 import { world, system, Player } from '@minecraft/server'
 import Score from '../extension/Score'
-import { ActionFormData, ModalFormData } from '@minecraft/server-ui';
-import OpenUI from '../extension/OpenUI';
 import { WorldDatabase } from '../extension/Database'
-import Tag from '../extension/Tag';
+import { npcShopMenu, summonNpc } from './npc'
 
 world.beforeEvents.chatSend.subscribe(data => {
     let player = data.sender;
@@ -29,8 +27,13 @@ world.beforeEvents.chatSend.subscribe(data => {
                 if (!player.hasTag('admin')) return noAdmin(player)
                 player.sendMessage(`${Score.get(player, args[1])}`)
                 break;
-            case 'test':
-                system.run(() => actionTest(player))
+            case 'shop':
+                system.run(() => npcShopMenu(player))
+                break;
+            case 'spawnnpc':
+                system.run(() => {
+                    summonNpc(player)
+                })
                 break;
             default:
                 player.sendMessage(`Error prefix`)
@@ -42,24 +45,4 @@ world.beforeEvents.chatSend.subscribe(data => {
 
 function noAdmin(player) {
     player.sendMessage(`[Access Denied]\n\nMenu ini hanya bisa diakses oleh Admin!!`)
-}
-
-/**
- * 
- * @param {Player} player 
- */
-function actionTest(player) {
-    let form = new ActionFormData()
-    .title('Title Test')
-    .body('Body Test')
-    .header('Header Test')
-    .button('Button 1 Test')
-    .divider()
-    .button('Button 2 Test')
-    .label('Label Test')
-    OpenUI.force(player, form).then(async r => {
-        if (r.canceled) return;
-        if (r.selection == 0) return player.sendMessage('Button 1 Test')
-        if (r.selection == 1) return player.sendMessage('Button 2 Test')
-    })
 }
