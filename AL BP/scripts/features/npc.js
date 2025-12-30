@@ -1,6 +1,5 @@
 import { World, Player } from "@minecraft/server";
 import { ActionFormData, ModalFormData } from '@minecraft/server-ui'
-import { PlayerDatabase } from "../extension/Database";
 import OpenUI from '../extension/OpenUI'
 import Score from "../extension/Score";
 
@@ -56,9 +55,7 @@ function spawnNPC(player, type, name, tagInput) {
 
     const tags = tagInput.split(',').map(t => t.trim()).filter(Boolean)
     for (const tag of tags) {
-        system.run(() => {
-            npc.addTag(tag)
-        })
+        npc.addTag(tag)
     }
 
     player.sendMessage(`NPC Berhasil dibuat!\nType: ${type}\nTag: ${tags.join(', ')}`)
@@ -74,9 +71,7 @@ export function npcShopMenu(player) {
     let func = []
     let form = new ActionFormData()
     form.title('Ancient Store')
-    form.body(`Player: ${player.nameTag}\nCoin: ${coin}`)
-    form.divider()
-    form.body(`Selamat datang di Ancient Store!\nPilih kategori item yang ingin kamu beli.`)
+    form.body(`Player: ${player.nameTag}\nCoin: ${coin}\n\nSelamat datang di Ancient Store!\nPilih kategori item yang ingin kamu beli.`)
     {
         form.button('Weapon', 'textures/items/diamond_sword')
         func.push(() => {
