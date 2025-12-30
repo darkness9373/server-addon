@@ -12,7 +12,7 @@ import Score from "../extension/Score";
 export function summonNpc(player) {
     let form = new ModalFormData()
     form.title('Summon NPC')
-    form.textField('Nama NPC')
+    form.textField('Nama NPC', 'Shop')
     form.textField('Tag NPC (pisahkan dengan koma dan tanpa spasi', 'sell,buy,shop')
     form.dropdown(
         'Jenis NPC',
@@ -51,9 +51,7 @@ function spawnNPC(player, type, name, tagInput) {
     }
 
     if (name.trim()) {
-        system.run(() => {
-            npc.nameTag = name
-        })
+        npc.nameTag = name;
     }
 
     const tags = tagInput.split(',').map(t => t.trim()).filter(Boolean)
