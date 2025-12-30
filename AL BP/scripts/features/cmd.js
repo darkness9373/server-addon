@@ -3,13 +3,14 @@ import Score from '../extension/Score'
 import { ActionFormData, ModalFormData } from '@minecraft/server-ui';
 import OpenUI from '../extension/OpenUI';
 import { WorldDatabase } from '../extension/Database'
+import Tag from '../extension/Tag';
 
 world.beforeEvents.chatSend.subscribe(data => {
     let player = data.sender;
     let prefix = new WorldDatabase('prefix').get() ?? '!'
     let msg = data.message;
     let args = msg.slice(prefix.length).split(' ')
-    if (msg.startsWith('!')) {
+    if (msg.startsWith(prefix)) {
         data.cancel = true;
         switch (args[0]) {
             case 'add':
@@ -31,9 +32,6 @@ world.beforeEvents.chatSend.subscribe(data => {
             case 'test':
                 system.run(() => actionTest(player))
                 break;
-            case 'test2':
-                actionTest(player)
-                break;
             default:
                 player.sendMessage(`Error prefix`)
                 break;
@@ -43,7 +41,7 @@ world.beforeEvents.chatSend.subscribe(data => {
 
 
 function noAdmin(player) {
-    player.sendMessage(`§cMenu ini hanya bisa digunakan oleh Admin!!`)
+    player.sendMessage(`[Access Denied]\n\nMenu ini hanya bisa diakses oleh Admin!!`)
 }
 
 /**

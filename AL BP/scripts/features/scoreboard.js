@@ -33,7 +33,7 @@ const board = {
         ' > Rank: @RANK',
         ' > Coin: @COIN',
         ' > Ping: @PINGms',
-        ' > Kill Monster: @KILLM',
+        ' > Kill Monster: @KILLMONSTER',
         '@BLANK',
         ' > Time Played: @TIMEPLAYED',
         ' > Online: @ONLINE player(s)',
@@ -55,12 +55,12 @@ system.run(function tick() {
                 PING: Score.get(player, 'ping'),
                 ONLINE: Array.from(world.getPlayers()).length,
                 BLANK: ' ',
-                BREAK: '=========================',
+                BREAK: '============================',
                 X: Math.floor(player.location.x),
                 Y: Math.floor(player.location.y),
                 Z: Math.floor(player.location.z),
-                KILL: Score.get(player, 'killMob'),
-                KILLM: Score.get(player, 'killMonster'),
+                KILLMOB: Score.get(player, 'killMob'),
+                KILLMONSTER: Score.get(player, 'killMonster'),
                 TIMEPLAYED: playtime(Score.get(player, 'timePlayed'))
             }
         ];
