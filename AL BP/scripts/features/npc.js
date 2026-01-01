@@ -1,29 +1,8 @@
-import { World, Player } from "@minecraft/server";
+import { World, Player, ItemStack, EntityComponentTypes } from "@minecraft/server";
 import { ActionFormData, ModalFormData } from '@minecraft/server-ui'
 import OpenUI from '../extension/OpenUI'
 import Score from "../extension/Score";
-
-
-const itemListBuy = [
-    {
-        id: 'diamond',
-        price: 40,
-        texture: 'diamond'
-    },
-    {
-        id: 'netherite',
-        price: 75,
-        texture: 'netherite'
-    },
-    {
-        id: 'nether_star',
-        price: 450,
-        texture: 'nether_star'
-    }
-]
-
-
-
+import Extra from "../extension/Extra";
 
 
 
@@ -98,7 +77,7 @@ export function npcShopMenu(player) {
     {
         form.button('Buy Items', 'textures/items/gold_ingot')
         func.push(() => {
-            return;
+            return buyItem(player)
         })
     }
     {
@@ -121,5 +100,63 @@ function buyItem(player) {
     let coin = Score.get(player, 'money')
     let func = []
     let form = new ActionFormData()
-    form.title(`Player: ${player.nameTag}\nCoins: ${coin}\n\n`)
+    form.title('Buy Items')
+    form.body(`Player: ${player.nameTag}\nCoins: ${coin}\n\nPilih item yang ingin kamu beli:`)
+    for (let i of itemListBuy) {
+        form.button(Extra.formatName(i.id) + `\n(${i.price})`, `textures/items/${i.texture}`)
+        func.push(() => {
+            buyItemModal(player, i.id, i.price)
+        })
+    }
+    OpenUI.force(player, form).then(async r => {
+        if (r.canceled) return
+        func[r.selection]()
+    })
 }
+
+/**
+ * 
+ * @param {Player} player 
+ * @param {string} id 
+ * @param {number} price 
+ */
+function buyItemModal(player, id, price) {
+    let coin = Score.get(player, 'money')
+    let form = new ModalFormData()
+    form.title('Buy Items')
+    form.slider(`Berapa jumlah item yang ingin kamu beli?`, 1, 64, { defaultValue: 1 })
+    form.submitButton('Buy')
+    OpenUI.force(player, form).then(async r => {
+        if (r.canceled) return;
+        const amount = r.formValues[0]
+        const totalPrice = amount * price
+        if (coin < totalPrice) {
+            return player.sendMessage(`[Failed]\nUang kamu tidak mencukupi untuk melakukan pembelian.`)
+        }
+        const item = new ItemStack('minecraft:' + id, amount)
+        player.getComponent(EntityComponentTypes.Inventory).container.addItem(item)
+        player.sendMessage(`[Successfull]\nKamu berhasil membeli ${amount} ${Extra.formatName(id)} dengan harga ${totalPrice} Coins.`)
+    })
+}
+
+
+
+
+
+const itemListBuy = [
+    {
+        id: 'diamond',
+        price: 40,
+        texture: 'diamond'
+    },
+    {
+        id: 'netherite',
+        price: 75,
+        texture: 'netherite'
+    },
+    {
+        id: 'nether_star',
+        price: 450,
+        texture: 'nether_star'
+    }
+]

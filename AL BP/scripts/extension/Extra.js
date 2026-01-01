@@ -14,6 +14,25 @@ class Extra {
         let scaled = value / Math.pow(10, selectType * 3)
         return scaled.toFixed(1) + types[selectType]
     }
+    /**
+     * 
+     * @param {string} id 
+     */
+    formatName(id) {
+        const exeptions = ['of', 'the', 'and', 'or', 'to']
+
+        return id
+            .split(':').pop()
+            .replace(/_/g, " ")
+            .split(' ')
+            .map((word, index) => {
+                if (index !== 0 && exeptions.includes(word)) {
+                    return word;
+                }
+                return word.charAt(0).toUpperCase() + word.slice(1)
+            })
+            .join(' ')
+    }
 }
 
 export default new Extra();
