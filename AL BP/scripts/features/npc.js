@@ -1,5 +1,5 @@
 import { World, Player, ItemStack, EntityComponentTypes } from "@minecraft/server";
-import { ActionFormData, ModalFormData } from '@minecraft/server-ui'
+import { ActionFormData, ModalFormData, MessageFormData } from '@minecraft/server-ui'
 import OpenUI from '../extension/OpenUI'
 import Score from "../extension/Score";
 import Extra from "../extension/Extra";
@@ -133,13 +133,35 @@ function buyItemModal(player, id, price) {
         if (coin < totalPrice) {
             return player.sendMessage(`[Failed]\nUang kamu tidak mencukupi untuk melakukan pembelian.`)
         }
-        const item = new ItemStack('minecraft:' + id, amount)
-        player.getComponent(EntityComponentTypes.Inventory).container.addItem(item)
-        player.sendMessage(`[Successfull]\nKamu berhasil membeli ${amount} ${Extra.formatName(id)} dengan harga ${totalPrice} Coins.`)
+        buyItemsConfirm(player, id, totalPrice, amount)
     })
 }
 
-
+/**
+ * 
+ * @param {Player} player 
+ * @param {string} id 
+ * @param {number} price 
+ */
+function buyItemsConfirm(player, id, price, amount) {
+    let form = new MessageFormData()
+    form.title('Confirm')
+    form.body(`Apakah kamu yakin ingin melakukan pembayaran?\n\nItem: ${Extra.formatName(id)}\nJumlah: ${amount}\nTotal Harga: ${price}`)
+    form.button1('Cancel Payment')
+    form.button2('Pay')
+    OpenUI.force(player, form).then(async r => {
+        if (r.canceled || r.selection === 0) return player.sendMessage('Pembayaran telah dibatalkan')
+        if (r.selection === 1) {
+            let coin = Score.get(player, 'money')
+            if (coin >= price) {
+                let item = new ItemStack('minecraft:' + id, amount)
+                player.getComponent(EntityComponentTypes.Inventory).container.addItem(item)
+                player.sendMessage(`[Successfull]\nKamu berhasil membeli ${amount} ${Extra.formatName(id)} dengan harga ${price} Coins.`)
+                Score.remove(player, 'money', price)
+            }
+        }
+    })
+}
 
 
 
