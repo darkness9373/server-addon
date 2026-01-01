@@ -223,7 +223,7 @@ function sellItemConfirm(player, id, amount, price) {
     OpenUI.force(player, form).then(async r => {
         if (r.canceled || r.selection === 1) return player.sendMessage('Penjualan telah dibatalkan.');
         if (r.selection === 0) {
-            const itemGet = countItem(player, id)
+            const itemGet = countItem(player, id);
             if (itemGet < amount) return player.sendMessage('[Failed]\nItem yang kamu miliki tidak mencukupi.');
             Score.add(player, 'money', price)
             removeItem(player, id, amount)
