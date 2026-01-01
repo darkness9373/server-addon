@@ -203,7 +203,7 @@ function sellItemModal(player, id, price) {
         let totalCoin = amount * price
         let itemGet = countItem(player, id)
         if (itemGet < amount) return player.sendMessage('[Failed]\nItem yang kamu miliki tidak mencukupi.');
-        sellItemConfirm()
+        sellItemConfirm(player, id, amount, totalCoin)
     })
 }
 
@@ -243,7 +243,7 @@ function countItem(player, id) {
 
     for (let i = 0; i < inv.size; i++) {
         const item = inv.getItem(i)
-        if (item && item.typeId === id) {
+        if (item && item.typeId === 'minecraft:' + id) {
             total += item.amount
         }
     }
@@ -262,7 +262,7 @@ function removeItem(player, id, amount) {
 
     for (let i = 0; i < inv.size && remaining > 0; i++) {
         const item = inv.getItem(i);
-        if (!item || item.typeId !== id) continue;
+        if (!item || item.typeId !== 'minecraft:' + id) continue;
         if (item.amount <= remaining) {
             remaining -= item.amount;
             inv.setItem(i, null);
