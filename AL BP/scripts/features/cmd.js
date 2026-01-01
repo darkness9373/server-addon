@@ -31,6 +31,7 @@ world.beforeEvents.chatSend.subscribe(data => {
                 system.run(() => npcShopMenu(player))
                 break;
             case 'spawnnpc':
+                if (!player.hasTag('admin')) return noAdmin(player)
                 system.run(() => {
                     summonNpc(player)
                 })

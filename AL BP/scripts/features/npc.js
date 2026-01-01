@@ -4,6 +4,29 @@ import OpenUI from '../extension/OpenUI'
 import Score from "../extension/Score";
 
 
+const itemListBuy = [
+    {
+        id: 'diamond',
+        price: 40,
+        texture: 'diamond'
+    },
+    {
+        id: 'netherite',
+        price: 75,
+        texture: 'netherite'
+    },
+    {
+        id: 'nether_star',
+        price: 450,
+        texture: 'nether_star'
+    }
+]
+
+
+
+
+
+
 /**
  * 
  * @param {Player} player 
@@ -73,19 +96,13 @@ export function npcShopMenu(player) {
     form.title('Ancient Store')
     form.body(`Player: ${player.nameTag}\nCoin: ${coin}\n\nSelamat datang di Ancient Store!\nPilih kategori item yang ingin kamu beli.`)
     {
-        form.button('Weapon', 'textures/items/diamond_sword')
+        form.button('Buy Items', 'textures/items/gold_ingot')
         func.push(() => {
             return;
         })
     }
     {
-        form.button('Armor', 'textures/items/iron_chestplate')
-        func.push(() => {
-            return;
-        })
-    }
-    {
-        form.button('Food', 'textures/items/beef_raw')
+        form.button('Sell Items', 'textures/items/paper')
         func.push(() => {
             return;
         })
@@ -94,4 +111,15 @@ export function npcShopMenu(player) {
         if (r.canceled) return
         func[r.selection]()
     })
+}
+
+/**
+ * 
+ * @param {Player} player 
+ */
+function buyItem(player) {
+    let coin = Score.get(player, 'money')
+    let func = []
+    let form = new ActionFormData()
+    form.title(`Player: ${player.nameTag}\nCoins: ${coin}\n\n`)
 }
