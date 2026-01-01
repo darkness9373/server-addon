@@ -83,7 +83,7 @@ export function npcShopMenu(player) {
     {
         form.button('Sell Items', 'textures/items/paper')
         func.push(() => {
-            return;
+            return sellItem(player)
         })
     }
     OpenUI.force(player, form).then(async r => {
@@ -145,13 +145,13 @@ function buyItemModal(player, id, price) {
  */
 function buyItemsConfirm(player, id, price, amount) {
     let form = new MessageFormData()
-    form.title('Confirm')
+    form.title('Confirmation')
     form.body(`Apakah kamu yakin ingin melakukan pembayaran?\n\nItem: ${Extra.formatName(id)}\nJumlah: ${amount}\nTotal Harga: ${price}`)
-    form.button1('Cancel Payment')
-    form.button2('Pay')
+    form.button2('Cancel')
+    form.button1('Confirm Payment')
     OpenUI.force(player, form).then(async r => {
-        if (r.canceled || r.selection === 0) return player.sendMessage('Pembayaran telah dibatalkan')
-        if (r.selection === 1) {
+        if (r.canceled || r.selection === 1) return player.sendMessage('Pembayaran telah dibatalkan')
+        if (r.selection === 0) {
             let coin = Score.get(player, 'money')
             if (coin >= price) {
                 let item = new ItemStack('minecraft:' + id, amount)
@@ -164,6 +164,117 @@ function buyItemsConfirm(player, id, price, amount) {
 }
 
 
+/**
+ * 
+ * @param {Player} player 
+ */
+function sellItem(player) {
+    let coin = Score.get(player, 'money')
+    let func = []
+    const form = new ActionFormData()
+    form.title('Sell Items')
+    form.body(`Coin: ${coin}\n\nPilih item yang ingin kamu jual:`)
+    for (let i of itemListSell) {
+        form.button(Extra.formatName(i.id) + `\n(${i.price}) Coin`, 'textures/items/' + i.texture)
+        func.push(() => {
+            sellItemModal(player, i.id, i.price)
+        })
+    }
+    OpenUI.force(player, form).then(async r => {
+        if (r.canceled) return;
+        func[r.selection]()
+    })
+}
+
+/**
+ * 
+ * @param {Player} player 
+ * @param {string} id 
+ * @param {number} price 
+ */
+function sellItemModal(player, id, price) {
+    const form = new ModalFormData()
+    form.title('Sell Items')
+    form.slider('Berapa jumlah item yang ingin kamu jual?', 1, 64, { defaultValue: 1 })
+    form.submitButton('Sell')
+    OpenUI.force(player, form).then(async r => {
+        if (r.canceled) return;
+        const amount = r.formValues[0]
+        let totalCoin = amount * price
+        let itemGet = countItem(player, id)
+        if (itemGet < amount) return player.sendMessage('[Failed]\nItem yang kamu miliki tidak mencukupi.');
+        sellItemConfirm()
+    })
+}
+
+/**
+ * 
+ * @param {Player} player 
+ * @param {string} id 
+ * @param {number} amount 
+ * @param {number} price 
+ */
+function sellItemConfirm(player, id, amount, price) {
+    const form = new MessageFormData()
+    form.title('Confirmation')
+    form.body(`Apakah kamu yakin ingin menjual?\n\nItem: ${Extra.formatName(id)}\nJumlah: ${amount}\nTotal Harga: ${price}`)
+    form.button2('Cancel')
+    form.button1('Confirm Sell')
+    OpenUI.force(player, form).then(async r => {
+        if (r.canceled || r.selection === 1) return player.sendMessage('Penjualan telah dibatalkan.');
+        if (r.selection === 0) {
+            const itemGet = countItem(player, id)
+            if (itemGet < amount) return player.sendMessage('[Failed]\nItem yang kamu miliki tidak mencukupi.');
+            Score.add(player, 'money', price)
+            removeItem(player, id, amount)
+            player.sendMessage(`[Successfull]\nBerhasil menjual ${amount} ${Extra.formatName(id)} dengan harga ${price} Coin.`)
+        }
+    })
+}
+
+/**
+ * 
+ * @param {Player} player 
+ * @param {string} id 
+ */
+function countItem(player, id) {
+    const inv = player.getComponent(EntityComponentTypes.Inventory).container
+    let total = 0
+
+    for (let i = 0; i < inv.size; i++) {
+        const item = inv.getItem(i)
+        if (item && item.typeId === id) {
+            total += item.amount
+        }
+    }
+    return total;
+}
+
+/**
+ * 
+ * @param {Player} player 
+ * @param {string} id 
+ * @param {number} amount 
+ */
+function removeItem(player, id, amount) {
+    const inv = player.getComponent(EntityComponentTypes.Inventory).container;
+    let remaining = amount;
+
+    for (let i = 0; i < inv.size && remaining > 0; i++) {
+        const item = inv.getItem(i);
+        if (!item || item.typeId !== id) continue;
+        if (item.amount <= remaining) {
+            remaining -= item.amount;
+            inv.setItem(i, null);
+        } else {
+            item.amount -= remaining;
+            inv.setItem(i, item);
+            remaining = 0;
+        }
+    }
+}
+
+
 
 const itemListBuy = [
     {
@@ -172,13 +283,41 @@ const itemListBuy = [
         texture: 'diamond'
     },
     {
-        id: 'netherite',
+        id: 'netherite_ingot',
         price: 75,
-        texture: 'netherite'
+        texture: 'netherite_ingot'
     },
     {
         id: 'nether_star',
         price: 450,
         texture: 'nether_star'
+    }
+]
+
+const itemListSell = [
+    {
+        id: 'rotten_flesh',
+        price: 4,
+        texture: 'rotten_flesh'
+    },
+    {
+        id: 'string',
+        price: 5,
+        texture: 'string'
+    },
+    {
+        id: 'spider_eye',
+        price: 7,
+        texture: 'spider_eye'
+    },
+    {
+        id: 'bone',
+        price: 6,
+        texture: 'bone'
+    },
+    {
+        id: 'ender_pearl',
+        price: 12,
+        texture: 'ender_pearl'
     }
 ]
