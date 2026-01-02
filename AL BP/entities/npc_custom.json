@@ -159,7 +159,10 @@
         "always_show": true,
         "allow_name_tag_renaming": true
       },
-      "minecraft:physics": {}
+      "minecraft:physics": {},
+      "minecraft:variant": {
+        "value": 0
+      }
     },
     "events": {
       "despawn": {
