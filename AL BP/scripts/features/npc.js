@@ -19,8 +19,7 @@ export function summonNpc(player) {
         'Jenis NPC',
         [
             'Normal',
-            'Custom',
-            'Custom Slim'
+            'Custom'
         ]
     )
     OpenUI.force(player, form).then(async r => {
@@ -28,8 +27,7 @@ export function summonNpc(player) {
         const [name, tagInput, typeIndex] = r.formValues;
         const entityType = [
             'minecraft:npc',
-            'npc:npc_custom_addtion_1',
-            'npc:npc_custom_slim_addtion_1'
+            'npc:npc_custom'
         ][typeIndex]
         spawnNPC(player, entityType, name, tagInput)
     })
