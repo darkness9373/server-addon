@@ -1,4 +1,5 @@
 import { world, Player, EntityComponentTypes } from '@minecraft/server'
+import Score from '../extension/Score';
 
 
 world.afterEvents.entityHitEntity.subscribe(data => {
@@ -9,7 +10,7 @@ world.afterEvents.entityHitEntity.subscribe(data => {
         if (hit.typeId === 'npc:npc_custom') {
             const hand = inv.getItem(player.selectedSlotIndex)
             if (!hand) return;
-            if (!player.hasTag('admin'))
+            if (!player.hasTag('admin')) return;
             if (hand.typeId === 'minecraft:stick') {
                 if (hand.nameTag === 'variant') {
                     const variant = hit.getComponent(EntityComponentTypes.Variant);
@@ -30,29 +31,29 @@ world.afterEvents.entityHitEntity.subscribe(data => {
                             break;
                     }
                 } else if (hand.nameTag === 'size') {
-                    let val = 0
-                    switch (val) {
+                    let size = Score.get(hit, 'size') ?? 0
+                    switch (size) {
                         case 0:
-                            hit.triggerEvent('minecraft:statue')
-                            val = 1
+                            hit.triggerEvent('minecraft:statue');
+                            Score.set(hit, 'size', 1);
                             break;
                         case 1:
-                            hit.triggerEvent('minecraft:normal')
-                            val = 0
+                            hit.triggerEvent('minecraft:normal');
+                            Score.set(hit, 'size', 0)
                             break;
                         default:
                             break;
                     }
                 } else if (hand.nameTag === 'look') {
-                    let val = 0
-                    switch (val) {
+                    let look = Score.get(hit, 'look') ?? 0
+                    switch (look) {
                         case 0:
-                            hit.triggerEvent('minecraft:can_look')
-                            val = 1
+                            hit.triggerEvent('minecraft:can_look');
+                            Score.set(hit, 'look', 1);
                             break;
                         case 1:
-                            hit.triggerEvent('minecraft:no_look')
-                            val = 0
+                            hit.triggerEvent('minecraft:no_look');
+                            Score.set(hit, 'look', 0)
                             break;
                         default:
                             break;
