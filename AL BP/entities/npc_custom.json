@@ -169,7 +169,7 @@
           ]
         }
       },
-      "zone": {
+      "minecraft:zone": {
         "add": {
           "component_groups": [
             "zone"
@@ -183,7 +183,7 @@
           ]
         }
       },
-      "iyan": {
+      "minecraft:iyan": {
         "add": {
           "component_groups": [
             "iyan"
@@ -197,7 +197,7 @@
           ]
         }
       },
-      "dark": {
+      "minecraft:dark": {
         "add": {
           "component_groups": [
             "dark"
@@ -211,7 +211,7 @@
           ]
         }
       },
-      "amay": {
+      "minecraft:amay": {
         "add": {
           "component_groups": [
             "amay"
@@ -225,7 +225,7 @@
           ]
         }
       },
-      "can_look": {
+      "minecraft:can_look": {
         "add": {
           "component_groups": [
             "can_look"
@@ -237,7 +237,7 @@
           ]
         }
       },
-      "no_look": {
+      "minecraft:no_look": {
         "add": {
           "component_groups": [
             "no_look"
@@ -249,7 +249,7 @@
           ]
         }
       },
-      "normal_size": {
+      "minecraft:normal": {
         "add": {
           "component_groups": [
             "normal_size"
@@ -261,7 +261,7 @@
           ]
         }
       },
-      "statue_size": {
+      "minecraft:statue": {
         "add": {
           "component_groups": [
             "statue"

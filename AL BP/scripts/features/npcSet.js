@@ -7,14 +7,15 @@ world.afterEvents.entityHitEntity.subscribe(data => {
     const inv = player.getComponent(EntityComponentTypes.Inventory).container;
     if (player instanceof Player) {
         if (hit.typeId === 'npc:npc_custom') {
-            if (inv.getItem(player.selectedSlotIndex).typeId === 'minecraft.stick' && inv.getItem(player.selectedSlotIndex).nameTag === 'variant') {
-                if (!player.hasTag('admin') || !player.isSneaking) return;
-                const variant = hit.getComponent(EntityComponentTypes.Variant)
-                if (variant.value == 0) hit.triggerEvent('iyan')
-                if (variant.value == 1) hit.triggerEvent('dark')
-                if (variant.value == 2) hit.triggerEvent('amay')
-                if (variant.value == 3) hit.triggerEvent('zone')
-            }
+            const hand = inv.getItem(player.selectedSlotIndex)
+            if (!hand) return;
+            if (hand.typeId !== 'minecraft:stick' || !hit.hasTag('statue')) return;
+            const variant = hit.getComponent(EntityComponentTypes.Variant);
+            player.sendMessage('Variant: ' + variant.value)
+            if (variant.value == 0) return hit.triggerEvent('minecraft:iyan')
+            if (variant.value == 1) return hit.triggerEvent('minecraft:dark')
+            if (variant.value == 2) return hit.triggerEvent('minecraft:amay')
+            if (variant.value == 3) return hit.triggerEvent('minecraft:zone')
         }
     }
 })
