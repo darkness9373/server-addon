@@ -1,4 +1,4 @@
-import { world, Player, EntityComponentTypes } from '@minecraft/server'
+import { world, Player, EntityComponentTypes, Entity } from '@minecraft/server'
 import Score from '../extension/Score';
 
 
@@ -53,6 +53,7 @@ world.afterEvents.entityHitEntity.subscribe(data => {
                             break;
                         case 1:
                             hit.triggerEvent('minecraft:no_look');
+                            faceEntityToPlayer8Dir(hit, player)
                             Score.set(hit, 'look', 0)
                             break;
                         default:
@@ -63,3 +64,42 @@ world.afterEvents.entityHitEntity.subscribe(data => {
         }
     }
 })
+
+
+
+/**
+ * 
+ * @param {Entity} entity 
+ * @param {Player} player 
+ */
+function getSnappedYaw(entity, player) {
+    const ex = entity.location.x;
+    const ez = entity.location.z;
+    const px = player.location.x;
+    const pz = player.location.z;
+
+    const dx = px - ex;
+    const dz = pz - ez;
+
+    let yaw = Math.atan2(-dx, dz) * (180 / Math.PI);
+
+    yaw = (yaw + 360) % 360;
+
+    const snappedYaw = Math.round(yaw / 45) * 45;
+
+    return snappedYaw % 360;
+}
+
+/**
+ * 
+ * @param {Entity} entity 
+ * @param {Player} player 
+ */
+function faceEntityToPlayer8Dir(entity, player) {
+    const yaw = getSnappedYaw(entity, player);
+
+    entity.setRotation({
+        x: 0,
+        y: yaw
+    })
+}
