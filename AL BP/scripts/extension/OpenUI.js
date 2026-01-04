@@ -1,4 +1,4 @@
-import { world, system, Player } from '@minecraft/server'
+import { world, system, Player, EntityComponentTypes } from '@minecraft/server'
 import { FormCancelationReason } from '@minecraft/server-ui'
 
 
@@ -12,10 +12,17 @@ class OpenUI {
         world.afterEvents.entityHitEntity.subscribe(data => {
             const entity = data.hitEntity;
             const player = data.damagingEntity;
-            if (entity.hasTag(tag)) {
-                system.run(() => {
-                    form(player)
-                })
+            if (player instanceof Player) {
+                const inv = player.getComponent(EntityComponentTypes.Inventory).container;
+                const hand = inv.getItem(player.selectedSlotIndex);
+                if (
+                    hand.nameTag === 'variant'
+                ) return;
+                if (entity.hasTag(tag)) {
+                    system.run(() => {
+                        form(player)
+                    })
+                }
             }
         })
     }
