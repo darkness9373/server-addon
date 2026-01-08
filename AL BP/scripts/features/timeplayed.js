@@ -20,7 +20,7 @@ export function playtime(sec) {
     let s = sec % 60
 
     if (d === 0) return `${pad(h)}:${pad(m)}:${pad(s)}`
-    return `${d}d(s) ${pad(h)}:${pad(m)}:${pad(s)}`
+    return `${d}d ${pad(h)}:${pad(m)}:${pad(s)}`
 }
 
 function pad(num) {

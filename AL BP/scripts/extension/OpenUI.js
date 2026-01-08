@@ -12,20 +12,21 @@ class OpenUI {
         world.afterEvents.entityHitEntity.subscribe(data => {
             const entity = data.hitEntity;
             const player = data.damagingEntity;
-            if (player instanceof Player) {
-                const inv = player.getComponent(EntityComponentTypes.Inventory).container;
-                const hand = inv.getItem(player.selectedSlotIndex);
-                if (
-                    hand.nameTag === 'variant'
-                ) return;
-                if (entity.hasTag(tag)) {
-                    system.run(() => {
-                        form(player)
-                    })
-                }
+            if (!(player instanceof Player)) return;
+            if (!entity.hasTag(tag)) return;
+            
+            let inv = player.getComponent(EntityComponentTypes.Inventory).container;
+            let item = inv.getItem(player.selectedSlotIndex)
+            const blocked = ['variant', 'size', 'look']
+            if (item && item.typeId === 'minecraft:stick' && blocked.includes(item.nameTag)) {
+                return;
             }
+            system.run(() => {
+                form(player)
+            })
         })
     }
+    
     /**
      * 
      * @template T

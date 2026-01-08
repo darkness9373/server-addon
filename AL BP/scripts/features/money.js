@@ -9,10 +9,10 @@ system.run(function tick() {
         let moneyRaw = Score.get(player, 'moneyRaw')
         if (money !== moneyRaw) {
             if (money > moneyRaw) {
-                player.sendMessage(`+${money - moneyRaw} Coins`)
+                player.sendMessage(`§a+${money - moneyRaw} Coins`)
                 Score.set(player, 'moneyRaw', money)
             } else {
-                player.sendMessage(`-${moneyRaw - money} Coins`)
+                player.sendMessage(`§c-${moneyRaw - money} Coins`)
                 Score.set(player, 'moneyRaw', money)
             }
         }

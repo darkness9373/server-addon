@@ -16,7 +16,7 @@ export class WorldDatabase {
         world.setDynamicProperty(this.id, value)
     }
     get() {
-        return world.getDynamicProperty(this.id)
+        return world.getDynamicProperty(this.id);
     }
     remove() {
         world.setDynamicProperty(this.id, undefined)

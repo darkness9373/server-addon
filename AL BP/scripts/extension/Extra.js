@@ -33,6 +33,7 @@ class Extra {
             })
             .join(' ')
     }
+    
 }
 
 export default new Extra();

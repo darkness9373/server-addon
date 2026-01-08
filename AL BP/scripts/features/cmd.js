@@ -2,10 +2,14 @@ import { world, system, Player } from '@minecraft/server'
 import Score from '../extension/Score'
 import { WorldDatabase } from '../extension/Database'
 import { npcShopMenu, summonNpc } from './npc'
+import { dataId } from '../config/database';
+import { warpUI } from './warp';
+import { changeName } from './nametag';
+import { makeRedeem, claimRedeem } from './redeem';
 
 world.beforeEvents.chatSend.subscribe(data => {
     let player = data.sender;
-    let prefix = new WorldDatabase('prefix').get() ?? '!'
+    let prefix = dataId.chatPrefix.get() ?? '!'
     let msg = data.message;
     let args = msg.slice(prefix.length).split(' ')
     if (msg.startsWith(prefix)) {
@@ -36,8 +40,30 @@ world.beforeEvents.chatSend.subscribe(data => {
                     summonNpc(player)
                 })
                 break;
+            case 'warp':
+                system.run(() => {
+                    warpUI(player)
+                })
+                break;
+            case 'cn':
+                system.run(() => {
+                    changeName(player)
+                })
+                break;
+            case 'mkredeem':
+                if (!player.hasTag('admin')) return noAdmin(player)
+                system.run(() => {
+                    makeRedeem(player)
+                })
+                break;
+            case 'redeem':
+                system.run(() => {
+                    claimRedeem(player)
+                })
+                break;
+            
             default:
-                player.sendMessage(`Error prefix`)
+                player.sendMessage(`§cError! Command ${args[0]} tidak terdaftar dalam sistem`)
                 break;
         }
     }
@@ -45,5 +71,5 @@ world.beforeEvents.chatSend.subscribe(data => {
 
 
 function noAdmin(player) {
-    player.sendMessage(`[Access Denied]\n\nMenu ini hanya bisa diakses oleh Admin!!`)
+    player.sendMessage(`§c[Access Denied]§r\n\n§6Menu ini hanya bisa diakses oleh Admin!!`)
 }

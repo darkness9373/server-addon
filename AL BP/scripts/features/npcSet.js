@@ -14,58 +14,27 @@ world.afterEvents.entityHitEntity.subscribe(data => {
             if (hand.typeId === 'minecraft:stick') {
                 if (hand.nameTag === 'variant') {
                     const variant = hit.getComponent(EntityComponentTypes.Variant);
-                    switch (variant.value) {
-                        case 0:
-                            hit.triggerEvent('minecraft:iyan')
-                            break;
-                        case 1:
-                            hit.triggerEvent('minecraft:dark')
-                            break;
-                        case 2:
-                            hit.triggerEvent('minecraft:amay')
-                            break;
-                        case 3:
-                            hit.triggerEvent('minecraft:zone')
-                            break;
-                        default:
-                            break;
-                    }
+                    const index = ['iyan', 'dark', 'amay', 'zone']
+                    hit.triggerEvent('minecraft:' + index[variant.value])
                 } else if (hand.nameTag === 'size') {
                     let size = Score.get(hit, 'size') ?? 0
-                    switch (size) {
-                        case 0:
-                            hit.triggerEvent('minecraft:statue');
-                            Score.set(hit, 'size', 1);
-                            break;
-                        case 1:
-                            hit.triggerEvent('minecraft:normal');
-                            Score.set(hit, 'size', 0)
-                            break;
-                        default:
-                            break;
-                    }
+                    let tog = 1 - size;
+                    const index = ['statue', 'normal']
+                    hit.triggerEvent('minecraft:' + index[size])
+                    Score.set(hit, 'size', tog)
                 } else if (hand.nameTag === 'look') {
                     let look = Score.get(hit, 'look') ?? 0
-                    switch (look) {
-                        case 0:
-                            hit.triggerEvent('minecraft:can_look');
-                            Score.set(hit, 'look', 1);
-                            break;
-                        case 1:
-                            hit.triggerEvent('minecraft:no_look');
-                            faceEntityToPlayer8Dir(hit, player)
-                            Score.set(hit, 'look', 0)
-                            break;
-                        default:
-                            break;
-                    }
+                    let tog = 1 - look;
+                    const index = ['can_look', 'no_look']
+                    hit.triggerEvent('minecraft:' + index[look])
+                    Score.set(hit, 'look', tog)
+                } else if (hand.nameTag === 'direction') {
+                    faceEntityToPlayer8Dir(hit, player)
                 }
             }
         }
     }
 })
-
-
 
 /**
  * 
