@@ -72,7 +72,7 @@ export function warpUI(player) {
  */
 function privateAddWarp(player) {
     let dt = JSON.parse(new PlayerDatabase('Warp', player).get()) || []
-    let lvl = new PlayerDatabase('Rank-Level', player).get() ?? 0
+    let lvl = new PlayerDatabase('RankLevel', player).get() ?? 0
     if (lvl === 0) return player.sendMessage(`§r[§aSystem§r] §cMenu ini hanya tersedia untuk rank §6Rookie§c atau lebih tinggi`)
     if (lvl === 1 && dt.length >= 2) return warpLimit(player);
     if (lvl === 2 && dt.length >= 3) return warpLimit(player);
