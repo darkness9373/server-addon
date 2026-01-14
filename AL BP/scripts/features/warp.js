@@ -184,7 +184,7 @@ function globalAddWarp(player) {
     const form = new ModalFormData()
         .title('Add Global Warp')
         .textField('Warp Name', 'Lobby')
-        .toggle('Gunakan lokasi player', true)
+        .toggle('Gunakan lokasi player', { defaultValue: true })
         .textField('Input Coordinate (x y z)', '0 100 0')
 
     OpenUI.force(player, form).then(r => {
