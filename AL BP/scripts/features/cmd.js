@@ -5,7 +5,7 @@ import { npcShopMenu, summonNpc } from './npc'
 import { getData } from '../config/database'
 import { warpUI } from './warp'
 import { makeRedeem, claimRedeem } from './redeem'
-import { addRankForm } from './rank'
+import { addRankForm, setRank } from './rank'
 import { healPlayer } from './heal'
 import { foodPlayer } from './food'
 import { text } from '../config/text'
@@ -88,7 +88,9 @@ world.beforeEvents.chatSend.subscribe(ev => {
             break
             
         case 'setrank':
-            // TODO
+            system.run(() => {
+                setRank(player)
+            })
             break
             
         default:
