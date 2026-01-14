@@ -2,258 +2,304 @@ import { world, Player } from "@minecraft/server";
 import { WorldDatabase, PlayerDatabase } from "../extension/Database";
 import { ActionFormData, ModalFormData } from "@minecraft/server-ui";
 import OpenUI from "../extension/OpenUI";
-import { dataId } from "../config/database";
+import { getData } from "../config/database";
+import { text } from '../config/text';
 
 /**
  * @typedef {import("@minecraft/server").Vector3} Vector3
  */
 
+/* ===========================
+   CONFIG
+=========================== */
 
-/**
- * 
- * @param {Player} player 
- */
+const WARP_LIMIT = {
+    1: 2,
+    2: 3,
+    3: 5,
+    4: 6,
+    5: 8
+}
+
+/* ===========================
+   MAIN UI
+=========================== */
+
 export function warpUI(player) {
-    let globalData = dataId.warpGlobal
-    let rawStr = globalData.get() ?? '[]'
-    let jsData = JSON.parse(rawStr)
-    let func = []
     const warp = new ActionFormData()
+    const actions = []
+
     warp.title('Warp Menu')
     warp.body('')
-    for (let i of jsData) {
-        warp.button(`${i.name}\n${i.pos.x} ${i.pos.y} ${i.pos.z}`)
-        func.push(() => {
-            runTeleport(player, i.name, i.dimension, { x: i.pos.x, y: i.pos.y, z: i.pos.z })
-        })
+
+    /* ===== GLOBAL WARP ===== */
+    const globalData = getData(player).warpGlobal
+    const globalList = JSON.parse(globalData.get() ?? '[]')
+
+    for (const g of globalList) {
+        warp.button(`§b${g.name}\n§7${g.pos.x} ${g.pos.y} ${g.pos.z}`)
+        actions.push(() => runTeleport(player, g.name, g.dimension, g.pos))
     }
+
     if (player.hasTag('admin')) {
-        warp.button('Add Global Warp')
-        func.push(() => {
-            globalAddWarp(player)
-        })
-        if (rawStr !== '[]') {
-            warp.button('Remove Global Warp')
-            func.push(() => {
-                globalRemoveWarp(player)
-            })
+        warp.button('§a+ Add Global Warp')
+        actions.push(() => globalAddWarp(player))
+
+        if (globalList.length > 0) {
+            warp.button('§c- Remove Global Warp')
+            actions.push(() => globalRemoveWarp(player))
         }
     }
-    warp.divider()
-    const privData = new PlayerDatabase('Warp', player).get() ?? '[]'
-    let js = JSON.parse(privData)
-    for (let y of js) {
-        warp.button(`${y.name}\n${y.pos.x} ${y.pos.y} ${y.pos.z}`)
-        func.push(() => {
-            runTeleport(player, y.name, y.dimension, { x: y.pos.x, y: y.pos.y, z: y.pos.z })
-        })
+
+    /* ===== SEPARATOR ===== */
+    warp.button('§8────────────')
+    actions.push(() => {})
+
+    /* ===== PRIVATE WARP ===== */
+    const privateData = new PlayerDatabase('Warp', player)
+    const privateList = JSON.parse(privateData.get() ?? '[]')
+
+    for (const p of privateList) {
+        warp.button(`§e${p.name}\n§7${p.pos.x} ${p.pos.y} ${p.pos.z}`)
+        actions.push(() => runTeleport(player, p.name, p.dimension, p.pos))
     }
-    {
-        warp.button('Add Warp')
-        func.push(() => {
-            privateAddWarp(player)
-        })
-        if (privData !== '[]') {
-            warp.button('Remove Warp')
-            func.push(() => {
-                privateRemoveWarp(player)
-            })
-        }
+
+    warp.button('§a+ Add Warp')
+    actions.push(() => privateAddWarp(player))
+
+    if (privateList.length > 0) {
+        warp.button('§c- Remove Warp')
+        actions.push(() => privateRemoveWarp(player))
     }
-    OpenUI.force(player, warp).then(async r => {
-        if (r.canceled) return;
-        func[r.selection]()
+
+    OpenUI.force(player, warp).then(r => {
+        if (r.canceled) return
+        actions[r.selection]?.()
     })
 }
 
-/**
- * 
- * @param {Player} player
- */
+/* ===========================
+   PRIVATE WARP
+=========================== */
+
 function privateAddWarp(player) {
-    let dt = JSON.parse(new PlayerDatabase('Warp', player).get()) || []
-    let lvl = new PlayerDatabase('RankLevel', player).get() ?? 0
-    if (lvl === 0) return player.sendMessage(`§r[§aSystem§r] §cMenu ini hanya tersedia untuk rank §6Rookie§c atau lebih tinggi`)
-    if (lvl === 1 && dt.length >= 2) return warpLimit(player);
-    if (lvl === 2 && dt.length >= 3) return warpLimit(player);
-    if (lvl === 3 && dt.length >= 5) return warpLimit(player);
-    if (lvl === 4 && dt.length >= 6) return warpLimit(player);
-    if (lvl === 5 && dt.length >= 8) return warpLimit(player);
+    const rankLevel = Number(new PlayerDatabase('RankLevel', player).get() ?? 0)
+    if (rankLevel <= 0) {
+        return player.sendMessage(
+            text('Menu ini hanya tersedia untuk rank Rookie atau lebih tinggi').System.fail
+        )
+    }
+
+    const limit = WARP_LIMIT[rankLevel] ?? 0
+    const db = new PlayerDatabase('Warp', player)
+    const list = JSON.parse(db.get() ?? '[]')
+
+    if (list.length >= limit) return warpLimit(player)
+
     const form = new ModalFormData()
-    form.title('Add Private Warp')
-    form.textField('Warp Name', 'House 1')
-    form.toggle('Input Location (off) / Use Player Location (on)', { defaultValue: true })
-    form.textField('Input Location', '103 21 -428')
-    OpenUI.force(player, form).then(async r => {
-        if (r.canceled) return;
-        let privData = new PlayerDatabase('Warp', player)
-        let rawStr = privData.get() ?? '[]'
-        let js = JSON.parse(rawStr)
-        const [name, toggle, pos] = r.formValues;
-        let exist = js.some(ex => ex.name === name)
-        if (exist === true) return player.sendMessage('Nama Warp tidak boleh sama dengan yang sudah ada!')
-        let ps = pos.trim().split(/\s+/).map(Number)
-        let add;
-        if (toggle == false) {
-            add = {
-                name: name,
-                pos: {
-                    x: ps[0],
-                    y: ps[1],
-                    z: ps[2]
-                },
-                dimension: player.dimension.id
+        .title('Add Private Warp')
+        .textField('Warp Name', 'House')
+        .toggle('Gunakan lokasi player', true)
+        .textField('Input Coordinate (x y z)', '100 64 -200')
+
+    OpenUI.force(player, form).then(r => {
+        if (r.canceled) return
+
+        const [name, usePlayerPos, input] = r.formValues
+        if (!name) return
+
+        if (list.some(w => w.name === name)) {
+            return player.sendMessage(
+                text('Nama warp sudah digunakan').System.fail
+            )
+        }
+
+        let pos
+        if (usePlayerPos) {
+            pos = {
+                x: Math.floor(player.location.x),
+                y: Math.floor(player.location.y),
+                z: Math.floor(player.location.z)
             }
         } else {
-            add = {
-                name: name,
-                pos: {
-                    x: Math.floor(player.location.x),
-                    y: Math.floor(player.location.y),
-                    z: Math.floor(player.location.z)
-                },
-                dimension: player.dimension.id
+            pos = parseVector3(input)
+            if (!pos) {
+                return player.sendMessage(
+                    text('Format koordinat tidak valid').System.fail
+                )
             }
         }
-        js.push(add)
-        privData.set(JSON.stringify(js))
-        player.sendMessage(`§aBerhasil menambahkan §g${name} §ake dalam Private Warp`)
-    })
-}
 
-function warpLimit(player) {
-    player.sendMessage(`§r[§aSystem§r]\n§cLimit warp untuk rank kamu saat ini sudah tercapai`)
+        list.push({
+            name,
+            pos,
+            dimension: player.dimension.id
+        })
+
+        db.set(JSON.stringify(list))
+        player.sendMessage(
+            text(`Warp §6${name} §aberhasil ditambahkan`).System.succ
+        )
+    })
 }
 
 function privateRemoveWarp(player) {
-    const privData = new PlayerDatabase('Warp', player)
-    let raw = privData.get() ?? '[]'
-    let js = JSON.parse(raw)
-    let func = []
+    const db = new PlayerDatabase('Warp', player)
+    const list = JSON.parse(db.get() ?? '[]')
+
     const form = new ActionFormData()
-    form.title('Remove Private Warp')
-    form.body('Pilih warp yang ingin kamu hapus')
-    for (let x of js) {
-        form.button(`${x.name}\n${x.pos.x} ${x.pos.y} ${x.pos.z}`)
-        func.push(() => {
-            let index = js.findIndex(wrp => wrp.name === x.name)
-            if (index === -1) return;
-            js.splice(index, 1)
-            privData.set(JSON.stringify(js))
-            player.sendMessage(`§aBerhasil menghapus §g${x.name} §adari daftar Private Warp`)
+        .title('Remove Private Warp')
+        .body('Pilih warp yang ingin dihapus')
+
+    const actions = []
+
+    for (const w of list) {
+        form.button(`${w.name}\n${w.pos.x} ${w.pos.y} ${w.pos.z}`)
+        actions.push(() => {
+            const index = list.findIndex(x => x.name === w.name)
+            if (index === -1) return
+
+            list.splice(index, 1)
+            db.set(JSON.stringify(list))
+            player.sendMessage(
+                text(`Warp §6${w.name} §aberhasil dihapus`).System.succ
+            )
         })
     }
+
     form.button('Close')
-    func.push(() => {
-        return;
-    })
-    OpenUI.force(player, form).then(async r => {
-        if (r.canceled) return;
-        func[r.selection]()
+    actions.push(() => {})
+
+    OpenUI.force(player, form).then(r => {
+        if (r.canceled) return
+        actions[r.selection]?.()
     })
 }
 
-/**
- * 
- * @param {Player} player 
- * @param {string} name 
- * @param {Vector3} pos 
- */
+/* ===========================
+   GLOBAL WARP
+=========================== */
+
 function globalAddWarp(player) {
     const form = new ModalFormData()
-    form.title('Add Global Warp')
-    form.textField('Warp Name', 'Lobby')
-    form.toggle('Input Location (off) / Use Player Location (on)', { defaultValue: true })
-    form.textField('Input Coordinate', '103 21 -428')
-    OpenUI.force(player, form).then(async r => {
-        if (r.canceled) return;
-        let globalData = dataId.warpGlobal;
-        let rawStr = globalData.get() ?? '[]'
-        let js = JSON.parse(rawStr)
-        const [name, toggle, pos] = r.formValues;
-        let exist = js.some(ex => ex.name === name)
-        if (exist === true) return player.sendMessage('Nama Warp tidak boleh sama dengan yang sudah ada!')
-        let ps = pos.trim().split(/\s+/).map(Number)
-        let add;
-        if (toggle == false) {
-            add = {
-                name: name,
-                pos: {
-                    x: ps[0],
-                    y: ps[1],
-                    z: ps[2]
-                },
-                dimension: player.dimension.id
+        .title('Add Global Warp')
+        .textField('Warp Name', 'Lobby')
+        .toggle('Gunakan lokasi player', true)
+        .textField('Input Coordinate (x y z)', '0 100 0')
+
+    OpenUI.force(player, form).then(r => {
+        if (r.canceled) return
+
+        const [name, usePlayerPos, input] = r.formValues
+        const globalData = getData(player).warpGlobal
+        const list = JSON.parse(globalData.get() ?? '[]')
+
+        if (list.some(w => w.name === name)) {
+            return player.sendMessage(
+                text('Nama warp sudah ada').System.fail
+            )
+        }
+
+        let pos
+        if (usePlayerPos) {
+            pos = {
+                x: Math.floor(player.location.x),
+                y: Math.floor(player.location.y),
+                z: Math.floor(player.location.z)
             }
         } else {
-            add = {
-                name: name,
-                pos: {
-                    x: Math.floor(player.location.x),
-                    y: Math.floor(player.location.y),
-                    z: Math.floor(player.location.z)
-                },
-                dimension: player.dimension.id
+            pos = parseVector3(input)
+            if (!pos) {
+                return player.sendMessage(
+                    text('Koordinat tidak valid').System.fail
+                )
             }
         }
-        js.push(add)
-        globalData.set(JSON.stringify(js))
-        player.sendMessage(`§aBerhasil menambahkan §g${name} §ake dalam Global Warp`)
-    })
-}
 
-/**
- * 
- * @param {Player} player 
- * @param {string} name
- * @param {string} dim 
- * @param {Vector3} pos 
- */
-function runTeleport(player, name, dim, pos) {
-    const x = pos.x;
-    const y = pos.y;
-    const z = pos.z;
-    
-    try {
-        player.tryTeleport(
-        {
-            x: x,
-            y: y,
-            z: z
-        },
-        {
-            dimension: world.getDimension(dim)
+        list.push({
+            name,
+            pos,
+            dimension: player.dimension.id
         })
-        player.sendMessage('§aBerhasil melakukan teleportasi menuju §g' + name + '§a!!')
-    } catch (err) {
-        player.sendMessage('Error saat melakukan teleportasi:\n\n' + err)
-    }
+
+        globalData.set(JSON.stringify(list))
+        player.sendMessage(
+            text(`Global warp §g${name} §aberhasil ditambahkan`).System.succ
+        )
+    })
 }
 
 function globalRemoveWarp(player) {
-    const globalData = dataId.warpGlobal
-    let raw = globalData.get() ?? '[]'
-    let js = JSON.parse(raw)
-    let func = []
+    const globalData = getData(player).warpGlobal
+    const list = JSON.parse(globalData.get() ?? '[]')
+
     const form = new ActionFormData()
-    form.title('Remove Global Warp')
-    form.body('Pilih warp yang ingin kamu hapus')
-    for (let x of js) {
-        form.button(`${x.name}\n${x.pos.x} ${x.pos.y} ${x.pos.z}`)
-        func.push(() => {
-            let index = js.findIndex(wrp => wrp.name === x.name)
-            if (index === -1) return;
-            js.splice(index, 1)
-            globalData.set(JSON.stringify(js))
-            player.sendMessage(`§aBerhasil menghapus §g${x.name} §adari daftar Global Warp`)
+        .title('Remove Global Warp')
+        .body('Pilih warp yang ingin dihapus')
+
+    const actions = []
+
+    for (const w of list) {
+        form.button(`${w.name}\n${w.pos.x} ${w.pos.y} ${w.pos.z}`)
+        actions.push(() => {
+            const index = list.findIndex(x => x.name === w.name)
+            if (index === -1) return
+
+            list.splice(index, 1)
+            globalData.set(JSON.stringify(list))
+            player.sendMessage(
+                text(`Global warp §g${w.name} §aberhasil dihapus`).System.succ
+            )
         })
     }
+
     form.button('Close')
-    func.push(() => {
-        return;
+    actions.push(() => {})
+
+    OpenUI.force(player, form).then(r => {
+        if (r.canceled) return
+        actions[r.selection]?.()
     })
-    OpenUI.force(player, form).then(async r => {
-        if (r.canceled) return;
-        func[r.selection]()
-    })
+}
+
+/* ===========================
+   TELEPORT
+=========================== */
+
+function runTeleport(player, name, dim, pos) {
+    let dimension
+    try {
+        dimension = world.getDimension(dim)
+    } catch {
+        return player.sendMessage(
+            text('Dimension tidak valid').System.fail
+        )
+    }
+
+    try {
+        player.tryTeleport(pos, { dimension })
+        player.sendMessage(
+            text(`Teleport ke §6${name} §aberhasil`).System.succ
+        )
+    } catch {
+        player.sendMessage(
+            text('Gagal melakukan teleport').System.fail
+        )
+    }
+}
+
+/* ===========================
+   UTIL
+=========================== */
+
+function warpLimit(player) {
+    player.sendMessage(
+        text('Limit warp untuk rank kamu sudah tercapai').System.fail
+    )
+}
+
+function parseVector3(input) {
+    const ps = input.trim().split(/\s+/).map(Number)
+    if (ps.length !== 3 || ps.some(isNaN)) return null
+    return { x: ps[0], y: ps[1], z: ps[2] }
 }

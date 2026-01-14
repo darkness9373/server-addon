@@ -10,7 +10,9 @@ class Score {
     add(entity, objective, amount) {
         let obj = world.scoreboard.getObjective(objective)
         if (!obj) {
-            world.scoreboard.addObjective(objective)
+            system.run(() => {
+                world.scoreboard.addObjective(objective)
+            })
         }
         system.run(() => {
             return world.scoreboard.getObjective(objective).addScore(entity, amount)
@@ -25,7 +27,9 @@ class Score {
     get(entity, objective) {
         let obj = world.scoreboard.getObjective(objective)
         if (!obj) {
-            world.scoreboard.addObjective(objective)
+            system.run(() => {
+                world.scoreboard.addObjective(objective)
+            })
         }
         try {
             let score = obj.getScore(entity)
@@ -42,7 +46,9 @@ class Score {
     remove(entity, objective, amount) {
         let obj = world.scoreboard.getObjective(objective)
         if (!obj) {
-            world.scoreboard.addObjective(objective)
+            system.run(() => {
+                world.scoreboard.addObjective(objective)
+            })
         }
         system.run(() => {
             return world.scoreboard.getObjective(objective).setScore(entity, this.get(entity, objective) - amount)
@@ -65,7 +71,9 @@ class Score {
     set(entity, objective, amount) {
         let obj = world.scoreboard.getObjective(objective)
         if (!obj) {
-            world.scoreboard.addObjective(objective)
+            system.run(() => {
+                world.scoreboard.addObjective(objective)
+            })
         }
         system.run(() => {
             return world.scoreboard.getObjective(objective).setScore(entity, amount)

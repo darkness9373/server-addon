@@ -1,75 +1,112 @@
-import { world, system, Player } from '@minecraft/server'
+import { world, system } from '@minecraft/server'
 import Score from '../extension/Score'
-import { WorldDatabase } from '../extension/Database'
+import { PlayerDatabase } from '../extension/Database'
 import { npcShopMenu, summonNpc } from './npc'
-import { dataId } from '../config/database';
-import { warpUI } from './warp';
-import { changeName } from './nametag';
-import { makeRedeem, claimRedeem } from './redeem';
+import { getData } from '../config/database'
+import { warpUI } from './warp'
+import { makeRedeem, claimRedeem } from './redeem'
+import { addRankForm } from './rank'
+import { healPlayer } from './heal'
+import { foodPlayer } from './food'
+import { text } from '../config/text'
 
-world.beforeEvents.chatSend.subscribe(data => {
-    let player = data.sender;
-    let prefix = dataId.chatPrefix.get() ?? '!'
-    let msg = data.message;
-    let args = msg.slice(prefix.length).split(' ')
-    if (msg.startsWith(prefix)) {
-        data.cancel = true;
-        switch (args[0]) {
-            case 'add':
-                if (!player.hasTag('admin')) return noAdmin(player)
-                Score.add(player, args[1], Number(args[2]))
-                break;
-            case 'set':
-                if (!player.hasTag('admin')) return noAdmin(player)
-                Score.set(player, args[1], Number(args[2]))
-                break;
-            case 'remove':
-                if (!player.hasTag('admin')) return noAdmin(player)
-                Score.remove(player, args[1], Number(args[2]))
-                break;
-            case 'get':
-                if (!player.hasTag('admin')) return noAdmin(player)
-                player.sendMessage(`${Score.get(player, args[1])}`)
-                break;
-            case 'shop':
-                system.run(() => npcShopMenu(player))
-                break;
-            case 'spawnnpc':
-                if (!player.hasTag('admin')) return noAdmin(player)
-                system.run(() => {
-                    summonNpc(player)
-                })
-                break;
-            case 'warp':
-                system.run(() => {
-                    warpUI(player)
-                })
-                break;
-            case 'cn':
-                system.run(() => {
-                    changeName(player)
-                })
-                break;
-            case 'mkredeem':
-                if (!player.hasTag('admin')) return noAdmin(player)
-                system.run(() => {
-                    makeRedeem(player)
-                })
-                break;
-            case 'redeem':
-                system.run(() => {
-                    claimRedeem(player)
-                })
-                break;
+world.beforeEvents.chatSend.subscribe(ev => {
+    const player = ev.sender
+    const msg = ev.message.trim()
+    const prefix = getData(player).chatPrefix.get() ?? '!'
+    
+    if (!msg.startsWith(prefix)) return
+    
+    ev.cancel = true
+    
+    const args = msg.slice(prefix.length).trim().split(/\s+/)
+    const cmd = args.shift()?.toLowerCase()
+    
+    if (!cmd) return
+    
+    switch (cmd) {
+        
+        case 'add':
+            if (!isAdmin(player)) return noAdmin(player)
+            Score.add(player, args[0], Number(args[1]))
+            break
             
-            default:
-                player.sendMessage(`§cError! Command ${args[0]} tidak terdaftar dalam sistem`)
-                break;
-        }
+        case 'set':
+            if (!isAdmin(player)) return noAdmin(player)
+            Score.set(player, args[0], Number(args[1]))
+            break
+            
+        case 'remove':
+            if (!isAdmin(player)) return noAdmin(player)
+            Score.remove(player, args[0], Number(args[1]))
+            break
+            
+        case 'get':
+            if (!isAdmin(player)) return noAdmin(player)
+            player.sendMessage(String(Score.get(player, args[0])))
+            break
+            
+        case 'shop':
+            system.run(() => npcShopMenu(player))
+            break
+            
+        case 'spawnnpc':
+            if (!isAdmin(player)) return noAdmin(player)
+            system.run(() => summonNpc(player))
+            break
+            
+        case 'warp':
+            system.run(() => warpUI(player))
+            break
+            
+        case 'mkredeem':
+            if (!isAdmin(player)) return noAdmin(player)
+            system.run(() => makeRedeem(player))
+            break
+            
+        case 'redeem':
+            system.run(() => claimRedeem(player))
+            break
+            
+        case 'addrank':
+            if (!isAdmin(player)) return noAdmin(player)
+            system.run(() => addRankForm(player))
+            break
+            
+        case 'ranklist':
+            player.sendMessage(
+                new PlayerDatabase('RankList', player).get() ?? '[]'
+            )
+            break
+            
+        case 'heal':
+            system.run(() => healPlayer(player))
+            break
+            
+        case 'food':
+            system.run(() => foodPlayer(player))
+            break
+            
+        case 'setrank':
+            // TODO
+            break
+            
+        default:
+            player.sendMessage(
+                text(`Command >${cmd}< tidak terdaftar`).System.fail
+            )
+            break
     }
 })
 
+/* ================= HELPER ================= */
+
+function isAdmin(player) {
+    return player.hasTag('admin')
+}
 
 function noAdmin(player) {
-    player.sendMessage(`§c[Access Denied]§r\n\n§6Menu ini hanya bisa diakses oleh Admin!!`)
+    player.sendMessage(
+        text('Menu ini hanya bisa diakses oleh Admin!!').System.warn
+    )
 }

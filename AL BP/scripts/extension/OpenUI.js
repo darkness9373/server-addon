@@ -17,7 +17,7 @@ class OpenUI {
             
             let inv = player.getComponent(EntityComponentTypes.Inventory).container;
             let item = inv.getItem(player.selectedSlotIndex)
-            const blocked = ['variant', 'size', 'look']
+            const blocked = ['variant', 'size', 'look', 'direction']
             if (item && item.typeId === 'minecraft:stick' && blocked.includes(item.nameTag)) {
                 return;
             }

@@ -4,25 +4,22 @@ import Score from '../extension/Score'
 import Extra from '../extension/Extra'
 import { playtime } from './timeplayed'
 
-
-
-/**
- * 
- * @param {string} text 
- * @param {any} data 
- */
+/* =========================
+   PLACEHOLDER ENGINE
+========================= */
 function getPlaceholder(text, data) {
     for (const item of data) {
         for (const key in item) {
-            if (item.hasOwnProperty(key)) {
-                const holder = new RegExp('@' + key, 'g')
-                text = text.replace(holder, item[key])
-            }
+            const holder = new RegExp('@' + key, 'g')
+            text = text.replace(holder, item[key])
         }
     }
-    return text;
+    return text
 }
 
+/* =========================
+   SCOREBOARD TEMPLATE
+========================= */
 const board = {
     Line: [
         '@BLANK',
@@ -43,59 +40,57 @@ const board = {
     ]
 }
 
-system.run(function tick() {
-    system.runTimeout(tick, 20)
+/* =========================
+   MAIN SCOREBOARD LOOP
+========================= */
+system.runInterval(() => {
+    const online = world.getPlayers().length
     
-    world.getPlayers().forEach(player => {
-        const Placeholder = [
-        {
-            NAME: player.nameTag,
-            COIN: Extra.metricNumber(Score.get(player, 'money')),
+    for (const player of world.getPlayers()) {
+        const data = [{
+            NAME: player.name,
             RANK: new PlayerDatabase('Rank', player).get() ?? 'Newbie',
-            PING: Score.get(player, 'ping'),
-            ONLINE: Array.from(world.getPlayers()).length,
+            COIN: Extra.metricNumber(Score.get(player, 'money') ?? 0),
+            PING: Score.get(player, 'ping') ?? 0,
+            ONLINE: online,
+            KILLMONSTER: Score.get(player, 'killMonster') ?? 0,
+            TIMEPLAYED: playtime(Score.get(player, 'timePlayed') ?? 0),
             BLANK: ' ',
-            BREAK: runLine(),
-            X: Math.floor(player.location.x),
-            Y: Math.floor(player.location.y),
-            Z: Math.floor(player.location.z),
-            KILLMOB: Score.get(player, 'killMob'),
-            KILLMONSTER: Score.get(player, 'killMonster'),
-            TIMEPLAYED: playtime(Score.get(player, 'timePlayed'))
-        }];
+            BREAK: runLine()
+        }]
+        
         player.onScreenDisplay.setTitle(
-            getPlaceholder(board.Line.join('\n'), Placeholder)
+            getPlaceholder(board.Line.join('\n'), data)
         )
-    })
-})
+    }
+}, 5)
 
-
-system.run(function tick() {
-    system.runTimeout(tick, 60)
-    
-    world.getPlayers().forEach(player => {
+/* =========================
+   PING SIMULATION
+========================= */
+system.runInterval(() => {
+    for (const player of world.getPlayers()) {
         const start = Date.now()
+        
         system.run(() => {
-            const end = Date.now()
-            const ping = end - start;
-            
+            const ping = Date.now() - start
             Score.set(player, 'ping', ping)
         })
-    })
-})
+    }
+}, 60)
 
+/* =========================
+   ANIMATED LINE
+========================= */
 function animatedLine(width, offset, inward) {
-    let line = ""
+    let line = ''
     const left = offset
     const right = width - offset - 1
+    
     for (let i = 0; i < width; i++) {
-        if (i === left) {
-            line += inward ? ">" : "<"
-        } else if (i === right) {
-            line += inward ? "<" : ">"
-        } else {
-            line += "§a—§r"
-        }
+        if (i === left) line += inward ? '>' : '<'
+        else if (i === right) line += inward ? '<' : '>'
+        else line += '§a—§r'
     }
     return line
 }
@@ -108,8 +103,10 @@ const center = Math.floor(width / 2) - 1
 function runLine() {
     const inward = dir === 1
     const line = animatedLine(width, offset, inward)
+    
     offset += dir
     if (offset >= center) dir = -1
     if (offset <= 0) dir = 1
-    return line;
+    
+    return line
 }

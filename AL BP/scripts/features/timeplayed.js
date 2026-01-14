@@ -1,26 +1,27 @@
-import { system, System, world } from "@minecraft/server";
+import { system, world } from "@minecraft/server";
 import Score from "../extension/Score";
 
-
-system.run(function tick() {
-    system.runTimeout(tick, 20)
-
-    world.getPlayers().forEach(player => {
+system.runInterval(() => {
+    for (const player of world.getPlayers()) {
         Score.add(player, 'timePlayed', 1)
-    })
-})
+    }
+}, 20) // 20 tick = 1 detik
 
 
-export function playtime(sec) {
-    let d = Math.floor(sec / 86400)
+export function playtime(sec = 0) {
+    const d = Math.floor(sec / 86400)
     sec %= 86400
-    let h = Math.floor(sec / 3600)
+    
+    const h = Math.floor(sec / 3600)
     sec %= 3600
-    let m = Math.floor(sec / 60)
-    let s = sec % 60
-
-    if (d === 0) return `${pad(h)}:${pad(m)}:${pad(s)}`
-    return `${d}d ${pad(h)}:${pad(m)}:${pad(s)}`
+    
+    const m = Math.floor(sec / 60)
+    const s = sec % 60
+    
+    if (d > 0) {
+        return `${d}d ${pad(h)}:${pad(m)}:${pad(s)}`
+    }
+    return `${pad(h)}:${pad(m)}:${pad(s)}`
 }
 
 function pad(num) {

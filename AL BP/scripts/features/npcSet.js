@@ -13,9 +13,12 @@ world.afterEvents.entityHitEntity.subscribe(data => {
             if (!player.hasTag('admin')) return;
             if (hand.typeId === 'minecraft:stick') {
                 if (hand.nameTag === 'variant') {
-                    const variant = hit.getComponent(EntityComponentTypes.Variant);
-                    const index = ['iyan', 'dark', 'amay', 'zone']
-                    hit.triggerEvent('minecraft:' + index[variant.value])
+                    const variant = hit.getComponent(EntityComponentTypes.Variant)
+                    if (!variant) return;
+                    const current = variant.value;
+                    const max = 4;
+                    const next = (current + 1) % max;
+                    hit.triggerEvent(`set_variant_${next}`);
                 } else if (hand.nameTag === 'size') {
                     let size = Score.get(hit, 'size') ?? 0
                     let tog = 1 - size;
@@ -46,16 +49,16 @@ function getSnappedYaw(entity, player) {
     const ez = entity.location.z;
     const px = player.location.x;
     const pz = player.location.z;
-
+    
     const dx = px - ex;
     const dz = pz - ez;
-
+    
     let yaw = Math.atan2(-dx, dz) * (180 / Math.PI);
-
+    
     yaw = (yaw + 360) % 360;
-
+    
     const snappedYaw = Math.round(yaw / 45) * 45;
-
+    
     return snappedYaw % 360;
 }
 
@@ -66,7 +69,7 @@ function getSnappedYaw(entity, player) {
  */
 function faceEntityToPlayer8Dir(entity, player) {
     const yaw = getSnappedYaw(entity, player);
-
+    
     entity.setRotation({
         x: 0,
         y: yaw

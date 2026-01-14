@@ -46,4 +46,4 @@ export class PlayerDatabase {
     remove() {
         this.player.setDynamicProperty(this.id, undefined)
     }
-}
+} 

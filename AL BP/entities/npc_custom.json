@@ -11,22 +11,22 @@
       "despawn": {
         "minecraft:instant_despawn": {}
       },
-      "zone": {
+      "variant_0": {
         "minecraft:variant": {
           "value": 0
         }
       },
-      "iyan": {
+      "variant_1": {
         "minecraft:variant": {
           "value": 1
         }
       },
-      "dark": {
+      "variant_2": {
         "minecraft:variant": {
           "value": 2
         }
       },
-      "amay": {
+      "variant_3": {
         "minecraft:variant": {
           "value": 3
         }
@@ -172,59 +172,31 @@
           ]
         }
       },
-      "minecraft:zone": {
+      "set_variant_0": {
         "add": {
           "component_groups": [
-            "zone"
-          ]
-        },
-        "remove": {
-          "component_groups": [
-            "iyan",
-            "dark",
-            "amay"
+            "variant_0"
           ]
         }
       },
-      "minecraft:iyan": {
+      "set_variant_1": {
         "add": {
           "component_groups": [
-            "iyan"
-          ]
-        },
-        "remove": {
-          "component_groups": [
-            "zone",
-            "dark",
-            "amay"
+            "variant_1"
           ]
         }
       },
-      "minecraft:dark": {
+      "set_variant_2": {
         "add": {
           "component_groups": [
-            "dark"
-          ]
-        },
-        "remove": {
-          "component_groups": [
-            "iyan",
-            "zone",
-            "amay"
+            "variant_2"
           ]
         }
       },
-      "minecraft:amay": {
+      "set_variant_3": {
         "add": {
           "component_groups": [
-            "amay"
-          ]
-        },
-        "remove": {
-          "component_groups": [
-            "iyan",
-            "dark",
-            "zone"
+            "variant_3"
           ]
         }
       },

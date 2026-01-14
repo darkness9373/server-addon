@@ -1,13 +1,16 @@
-import { WorldDatabase } from "../extension/Database"
+import { WorldDatabase, PlayerDatabase } from "../extension/Database"
 
-export const dataId = {
-    warpGlobal: new WorldDatabase('Warp'),
-    chatPrefix: new WorldDatabase('Prefix'),
-    types: {
-        warp: 'Warp',
-        nametag: 'NameTag'
-    },
-    price: {
-        nametag: 100
+
+export function getData(player) {
+    return {
+        warpGlobal: new WorldDatabase('Warp'),
+        warpPrivate: new PlayerDatabase('Warp', player),
+        chatPrefix: new WorldDatabase('Prefix'),
+        rank: new PlayerDatabase('Rank', player),
+        rankLevel: new PlayerDatabase('RankLevel', player),
+        rankList: new PlayerDatabase('RankList', player),
+        price: {
+            nametag: 100
+        }
     }
 }
