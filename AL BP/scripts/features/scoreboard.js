@@ -23,7 +23,7 @@ function getPlaceholder(text, data) {
 const board = {
     Line: [
         '@BLANK',
-        '      Ya Allah lindungi Bilqis',
+        '     Ancient Survival     ',
         '@BREAK',
         '@BLANK',
         ' §a>§r Name: @NAME',
@@ -97,7 +97,7 @@ function animatedLine(width, offset, inward) {
 
 let offset = 0
 let dir = 1
-const width = 25
+const width = 26
 const center = Math.floor(width / 2) - 1
 
 function runLine() {
