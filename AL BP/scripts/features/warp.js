@@ -99,7 +99,7 @@ function privateAddWarp(player) {
     const form = new ModalFormData()
         .title('Add Private Warp')
         .textField('Warp Name', 'House')
-        .toggle('Gunakan lokasi player', true)
+        .toggle('Gunakan lokasi player', { defaultValue: true })
         .textField('Input Coordinate (x y z)', '100 64 -200')
 
     OpenUI.force(player, form).then(r => {
