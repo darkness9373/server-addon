@@ -9,6 +9,7 @@ import { addRankForm, setRank } from './rank'
 import { healPlayer } from './heal'
 import { foodPlayer } from './food'
 import { text } from '../config/text'
+import { checkpointCommand } from './last';
 
 world.beforeEvents.chatSend.subscribe(ev => {
     const player = ev.sender
@@ -92,11 +93,14 @@ world.beforeEvents.chatSend.subscribe(ev => {
                 setRank(player)
             })
             break
-            
+        case 'checkpoint':
+            system.run(() => checkpointCommand(player))
+            break;
         default:
             player.sendMessage(
                 text(`Command >${cmd}< tidak terdaftar`).System.fail
             )
+            system.run(() => player.playSound('note.bass'))
             break
     }
 })
