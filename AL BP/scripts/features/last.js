@@ -8,7 +8,8 @@ import { text } from '../config/text'
 world.afterEvents.playerSpawn.subscribe(ev => {
     const player = ev.player
     if (!ev.initialSpawn) return
-
+    const pos = player.location;
+    if (pos.x === LOBBY_POS.x && pos.y === LOBBY_POS.y && pos.z === LOBBY_POS.z && player.dimension.id === LOBBY_POS.dimension) return;
     system.runTimeout(() => {
         saveLastLocation(player)
         teleportToLobby(player)
