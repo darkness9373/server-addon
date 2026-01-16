@@ -14,6 +14,7 @@ import { text } from '../config/text';
 =========================== */
 
 const WARP_LIMIT = {
+    0: 1,
     1: 2,
     2: 3,
     3: 5,
@@ -37,38 +38,41 @@ export function warpUI(player) {
     const globalList = JSON.parse(globalData.get() ?? '[]')
 
     for (const g of globalList) {
-        warp.button(`§b${g.name}\n§7${g.pos.x} ${g.pos.y} ${g.pos.z}`)
+        warp.button(`§l§b${g.name}§r\n${g.pos.x} ${g.pos.y} ${g.pos.z}`)
         actions.push(() => runTeleport(player, g.name, g.dimension, g.pos))
     }
 
     if (player.hasTag('admin')) {
-        warp.button('§a+ Add Global Warp')
+        warp.button('§l§a+ Add Global Warp +')
         actions.push(() => globalAddWarp(player))
 
         if (globalList.length > 0) {
-            warp.button('§c- Remove Global Warp')
+            warp.button('§l§c- Remove Global Warp -')
             actions.push(() => globalRemoveWarp(player))
         }
     }
 
     /* ===== SEPARATOR ===== */
-    warp.button('§8────────────')
-    actions.push(() => {})
+    warp.divider()
 
     /* ===== PRIVATE WARP ===== */
     const privateData = new PlayerDatabase('Warp', player)
     const privateList = JSON.parse(privateData.get() ?? '[]')
-
+    const rankLevel = Number(new PlayerDatabase('RankLevel', player).get() ?? 0)
+    const limit = WARP_LIMIT[rankLevel] ?? 0
+    const db = new PlayerDatabase('Warp', player)
+    const list = JSON.parse(db.get() ?? '[]')
+    warp.label(list.length + '/' + limit)
     for (const p of privateList) {
-        warp.button(`§e${p.name}\n§7${p.pos.x} ${p.pos.y} ${p.pos.z}`)
+        warp.button(`§l§e${p.name}\n§r${p.pos.x} ${p.pos.y} ${p.pos.z}`)
         actions.push(() => runTeleport(player, p.name, p.dimension, p.pos))
     }
 
-    warp.button('§a+ Add Warp')
+    warp.button('§l§a+ Add Warp +')
     actions.push(() => privateAddWarp(player))
 
     if (privateList.length > 0) {
-        warp.button('§c- Remove Warp')
+        warp.button('§l§c- Remove Warp -')
         actions.push(() => privateRemoveWarp(player))
     }
 
@@ -84,11 +88,11 @@ export function warpUI(player) {
 
 function privateAddWarp(player) {
     const rankLevel = Number(new PlayerDatabase('RankLevel', player).get() ?? 0)
-    if (rankLevel <= 0) {
-        return player.sendMessage(
-            text('Menu ini hanya tersedia untuk rank Rookie atau lebih tinggi').System.fail
-        )
-    }
+    //if (rankLevel <= 0) {
+    //    return player.sendMessage(
+    //        text('Menu ini hanya tersedia untuk rank Rookie atau lebih tinggi').System.fail
+    //    )
+    //}
 
     const limit = WARP_LIMIT[rankLevel] ?? 0
     const db = new PlayerDatabase('Warp', player)
@@ -106,7 +110,7 @@ function privateAddWarp(player) {
         if (r.canceled) return
 
         const [name, usePlayerPos, input] = r.formValues
-        if (!name) return
+        if (!name) return player.sendMessage(text('Nama tidak boleh kosong!').System.fail)
 
         if (list.some(w => w.name === name)) {
             return player.sendMessage(
@@ -138,7 +142,7 @@ function privateAddWarp(player) {
 
         db.set(JSON.stringify(list))
         player.sendMessage(
-            text(`Warp §6${name} §aberhasil ditambahkan`).System.succ
+            text(`Warp berhasil ditambahkan\n    > Nama : §e${name}\n    §a> Koordinat : §e${pos.x} ${pos.y} ${pos.z}`).System.succ
         )
     })
 }

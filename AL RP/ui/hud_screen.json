@@ -12,7 +12,7 @@
         "sidebar": {
           "type": "panel",
           "size": ["100%c", "100%c"],
-          "offset": [0, -50],
+          "offset": [0, 0],
           "controls": [
             {
               "title_background": {
