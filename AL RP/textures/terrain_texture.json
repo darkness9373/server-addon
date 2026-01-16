@@ -4,8 +4,8 @@
     "resource_pack_name": "Ancient Legacy",
     "texture_name": "atlas.terrain",
     "texture_data": {
-        "gravestone_player": {
-            "textures": "textures/gravestone/gravestone"
+        "gravestone": {
+            "textures": "textures/blocks/gravestone"
         }
     }
 }

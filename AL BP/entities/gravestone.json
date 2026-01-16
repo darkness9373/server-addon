@@ -2,7 +2,7 @@
     "format_version": "1.20.80",
     "minecraft:entity": {
         "description": {
-            "identifier": "drk:gravestone_item_container",
+            "identifier": "drk:gravestone_con",
             "is_spawnable": true,
             "is_summonable": true,
             "is_experimental": false
@@ -26,7 +26,7 @@
                 "additional_slots_per_strength": 0,
                 "can_be_siphoned_from": false,
                 "container_type": "inventory",
-                "inventory_size": 256,
+                "inventory_size": 54,
                 "private": false,
                 "restrict_to_owner": true
             },

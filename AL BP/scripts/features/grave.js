@@ -1,47 +1,33 @@
-import { world, BlockPermutation, ItemStack, Player } from "@minecraft/server";
-import { text } from '../config/text'
-
-world.beforeEvents.playerBreakBlock.subscribe(async data => {
-    const player = data.player;
-    const block = data.block;
-    if (block.typeId === 'drk:gravestone_player') {
-        await null;
-        let entities = player.dimension.getEntities({
-            location: block.location,
-            type: 'drk:gravestone_item_container',
-            maxDistance: 1
-        })
-        entities.forEach(entity => {
-            entity.kill()
-        })
-    }
-})
+import { world, BlockPermutation, Player } from "@minecraft/server";
+import { text } from "../config/text";
 
 world.afterEvents.entityDie.subscribe(data => {
     const player = data.deadEntity;
     if (!(player instanceof Player)) return;
-    let playerName = player.nameTag
-    let loc = player.location
-    let locX = Math.floor(loc.x)
-    let locy = Math.floor(loc.y)
-    let locz = Math.floor(loc.z)
+    const dim = player.dimension;
+    const loc = player.location;
+    const locx = Math.floor(loc.x)
+    const locy = Math.floor(loc.y)
+    const locz = Math.floor(loc.z)
 
-    let playerInv = player.getComponent('inventory').container
-    let graveStoneBlock = BlockPermutation.resolve('drk:gravestone_player')
-    let graveStoneEntity = player.dimension.spawnEntity('drk:gravestone_item_container', {x: locX + 0.5, y: locy, z: locz + 0.5})
-    let graveStoneInv = graveStoneEntity.getComponent('inventory').container
-    let getBlock = player.dimension.getBlock(loc)
-    let getNearby = player.dimension.getEntities({ location: loc, type: 'minecraft:item', maxDistance: 3 })
-    player.sendMessage(text(`Kamu mati di ${locx} ${locy} ${locz}`).System.fail)
-    getBlock.setPermutation(graveStoneBlock)
-    graveStoneEntity.nameTag = `${playerName}`
+    const block = dim.getBlock(loc)
+    block.setPermutation(BlockPermutation.resolve('drk:gravestone'))
 
-    for (const item of getNearby) {
-        if (graveStoneInv.emptySlotsCount <= 0) {
-            break;
+    const grave = dim.spawnEntity(
+        'drk:gravestone_con',
+        {
+            x: locx,
+            y: locy,
+            z: locz
         }
-        let itemStack = item.getComponent('item').itemStack;
-        graveStoneInv.addItem(itemStack)
-        item.remove()
-    }
+    )
+
+    grave.nameTag = `Grave of ${player.name}`
+    grave.addTag(`owner:${player.name}`)
+
+    const items = dim.getEntities({
+        type: 'minecraft:item',
+        location: loc,
+        maxDistance: 3
+    })
 })
