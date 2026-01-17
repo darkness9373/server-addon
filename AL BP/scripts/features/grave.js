@@ -71,13 +71,20 @@ world.afterEvents.entityDie.subscribe(data => {
     const player = data.deadEntity;
     const dim = player.dimension;
     const pos = player.location;
-    
-    const block = dim.getBlock(pos)
+    const posx = Math.floor(pos.x)
+    const posy = Math.floor(pos.y)
+    const posz = Math.floor(pos.z)
+    const posFl = {
+        x: posx,
+        y: posy,
+        z: posz
+    }
+    const block = dim.getBlock(posFl)
     
     const grave = dim.spawnEntity(GRAVESTONE_ENTITY, {
-        x: pos.x + 0.5,
-        y: pos.y,
-        z: pos.z + 0.5
+        x: posx + 0.5,
+        y: posy,
+        z: posz + 0.5
     })
     const graveInv = grave.getComponent('inventory').container;
     const near = dim.getEntities({
@@ -85,7 +92,7 @@ world.afterEvents.entityDie.subscribe(data => {
         type: 'minecraft:item',
         maxDistance: 3
     })
-    player.sendMessage(text(`Kamu mati di §e${pos.x} ${pos.y} ${pos.z}`).System.fail)
+    player.sendMessage(text(`Kamu mati di §e${posx} ${posy} ${posz}`).System.fail)
     block.setPermutation(BlockPermutation.resolve(GRAVESTONE_BLOCK))
     grave.nameTag = `${player.name}`
     grave.addTag('owner:' + player.id)
