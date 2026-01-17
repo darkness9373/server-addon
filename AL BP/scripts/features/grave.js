@@ -1,5 +1,6 @@
 import { world, BlockPermutation, ItemStack, Player } from "@minecraft/server";
 import { text } from '../config/text'
+import Extra from '../extension/Extra'
 
 const GRAVESTONE_ENTITY = 'drk:gravestone_item'
 const GRAVESTONE_BLOCK = 'drk:gravestone_block'
@@ -19,7 +20,7 @@ world.beforeEvents.playerBreakBlock.subscribe(async data => {
     if (entities.length === 0) return
     
     const grave = entities[0]
-    const ownerTag = `owner:${player.name}`
+    const ownerTag = `owner:${player.id}`
     
     if (!grave.hasTag(ownerTag)) {
         data.cancel = true
@@ -30,6 +31,37 @@ world.beforeEvents.playerBreakBlock.subscribe(async data => {
     }
     
     grave.kill()
+})
+
+world.beforeEvents.playerInteractWithBlock.subscribe(async data => {
+    const player = data.player;
+    const block = data.block;
+    const dim = player.dimension
+    if (block.typeId !== GRAVESTONE_BLOCK) return;
+    await null;
+
+    const grave = dim.getEntities({
+        type: GRAVESTONE_ENTITY,
+        location: block.location,
+        maxDistance: 1
+    })[0]
+    const ownerTag = 'owner:' + player.id
+
+    if (!grave.hasTag(ownerTag)) {
+        data.cancel = true
+        player.sendMessage(
+            text('Ini bukan gravestone milikmu!').System.fail
+        )
+        return
+    }
+
+    const graveInv = grave.getComponent('inventory').container;
+    const playerInv = player.getComponent('inventory').container;
+
+    for (let i = 0; i < graveInv.size; i++) {
+        const item = graveInv.getItem(i)
+        if (item) playerInv.addItem(item)
+    }
 })
 
 world.afterEvents.entityDie.subscribe(data => {
@@ -46,14 +78,14 @@ world.afterEvents.entityDie.subscribe(data => {
     })
     const graveInv = grave.getComponent('inventory').container;
     const near = dim.getEntities({
-        location = pos,
+        location: pos,
         type: 'minecraft:item',
         maxDistance: 3
     })
     player.sendMessage(text(`Kamu mati di §e${pos.x} ${pos.y} ${pos.z}`).System.fail)
     block.setPermutation(BlockPermutation.resolve(GRAVESTONE_BLOCK))
     grave.nameTag = `${player.name}`
-    
+    grave.addTag('owner:' + player.id)
     for (const item of near) {
         if (graveInv.emptySlotsCount <= 0) {
             break;
