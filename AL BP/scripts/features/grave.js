@@ -1,4 +1,4 @@
-import { world, BlockPermutation, ItemStack, Player } from "@minecraft/server";
+import { world, BlockPermutation, ItemStack, Player, BlockTypes } from "@minecraft/server";
 import { text } from '../config/text'
 import Extra from '../extension/Extra'
 
@@ -62,6 +62,9 @@ world.beforeEvents.playerInteractWithBlock.subscribe(async data => {
         const item = graveInv.getItem(i)
         if (item) playerInv.addItem(item)
     }
+
+    block.setPermutation(BlockPermutation.resolve('minecraft:air'))
+    grave.remove()
 })
 
 world.afterEvents.entityDie.subscribe(data => {
