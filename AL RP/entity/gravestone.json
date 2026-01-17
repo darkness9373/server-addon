@@ -2,7 +2,7 @@
     "format_version": "1.20.80",
     "minecraft:client_entity": {
         "description": {
-            "identifier": "drk:gravestone_con",
+            "identifier": "drk:gravestone_item",
             "materials": {
                 "default": "entity_alphatest"
             },
@@ -10,10 +10,10 @@
                 "default": "textures/items/gravestone"
             },
             "geometry": {
-                "default": "geometry.gravestone_con"
+                "default": "geometry.gravestone_item"
             },
             "render_controllers": [
-                "controller.render.gravestone_con"
+                "controller.render.gravestone_item"
             ],
             "spawn_egg": {
                 "base_color": "#000000",

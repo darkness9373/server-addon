@@ -2,7 +2,7 @@
     "format_version": "1.20.80",
     "minecraft:entity": {
         "description": {
-            "identifier": "drk:gravestone_con",
+            "identifier": "drk:gravestone_item",
             "is_spawnable": true,
             "is_summonable": true,
             "is_experimental": false

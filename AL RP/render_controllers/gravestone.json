@@ -1,7 +1,7 @@
 {
     "format_version": "1.10.0",
     "render_controllers": {
-        "controller.render.gravestone_con": {
+        "controller.render.gravestone_item": {
             "geometry": "geometry.default",
             "materials": [
                 {
