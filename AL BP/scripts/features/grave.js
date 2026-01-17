@@ -69,16 +69,12 @@ world.beforeEvents.playerInteractWithBlock.subscribe(async data => {
 
 world.afterEvents.entityDie.subscribe(data => {
     const player = data.deadEntity;
+    if (!(player instanceof Player)) return;
     const dim = player.dimension;
     const pos = player.location;
     const posx = Math.floor(pos.x)
     const posy = Math.floor(pos.y)
     const posz = Math.floor(pos.z)
-    const posFl = {
-        x: posx,
-        y: posy,
-        z: posz
-    }
     const block = dim.getBlock(posFl)
     
     const grave = dim.spawnEntity(GRAVESTONE_ENTITY, {
