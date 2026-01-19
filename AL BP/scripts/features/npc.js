@@ -473,11 +473,11 @@ const itemListBuy = {
     
     Enchant: [
     {
-        name: 'Efficiency III',
+        name: 'Efficiency V',
         id: 'enchanted_book',
-        price: 150,
+        price: 220,
         tex: 'textures/items/book_enchanted',
-        enchant: { id: 'efficiency', level: 3 }
+        enchant: { id: 'efficiency', level: 5 }
     },
     {
         name: 'Unbreaking III',
@@ -487,23 +487,23 @@ const itemListBuy = {
         enchant: { id: 'unbreaking', level: 3 }
     },
     {
-        name: 'Sharpness II',
+        name: 'Sharpness V',
         id: 'enchanted_book',
-        price: 120,
+        price: 215,
         tex: 'textures/items/book_enchanted',
-        enchant: { id: 'sharpness', level: 2 }
+        enchant: { id: 'sharpness', level: 5 }
     },
     {
-        name: 'Protection III',
+        name: 'Protection IV',
         id: 'enchanted_book',
-        price: 160,
+        price: 180,
         tex: 'textures/items/book_enchanted',
-        enchant: { id: 'protection', level: 3 }
+        enchant: { id: 'protection', level: 4 }
     },
     {
         name: 'Fortune III',
         id: 'enchanted_book',
-        price: 200,
+        price: 235,
         tex: 'textures/items/book_enchanted',
         enchant: { id: 'fortune', level: 3 }
     },
@@ -520,6 +520,13 @@ const itemListBuy = {
         price: 175,
         tex: 'textures/items/book_enchanted',
         enchant: { id: 'silk_touch', level: 1 }
+    },
+    {
+        name: 'Looting III',
+        id: 'enchanted_book',
+        price: 225,
+        tex: 'textures/items/book_enchanted',
+        enchant: { id: 'looting', level: 3 }
     }],
     Miscellaneous: [
         { id: 'totem_of_undying', price: 145, tex: 'textures/items/totem' },
