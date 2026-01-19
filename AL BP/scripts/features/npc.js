@@ -453,13 +453,11 @@ const itemListBuy = {
         { id: 'cooked_beef', price: 5, tex: 'textures/items/beef_cooked' },
         { id: 'cooked_porkchop', price: 5, tex: 'textures/items/porkchop_cooked' },
         
-        { id: 'honey_bottle', price: 4, tex: 'textures/items/honey_bottle' },
+        { id: 'honey_bottle', price: 8, tex: 'textures/items/honey_bottle' },
         { id: 'milk_bucket', price: 7, tex: 'textures/items/bucket_milk' },
         
         { id: 'golden_carrot', price: 10, tex: 'textures/items/carrot_golden' },
-        { id: 'golden_apple', price: 30, tex: 'textures/items/apple_golden' },
-        
-        { id: 'totem_of_undying', price: 145, tex: 'textures/items/totem' }
+        { id: 'golden_apple', price: 30, tex: 'textures/items/apple_golden' }
     ],
     
     Material: [
@@ -469,7 +467,8 @@ const itemListBuy = {
         { id: 'redstone', price: 10, tex: 'textures/items/redstone_dust' },
         { id: 'amethyst_shard', price: 25, tex: 'textures/items/amethyst_shard' },
         { id: 'diamond', price: 70, tex: 'textures/items/diamond' },
-        { id: 'netherite_scrap', price: 180, tex: 'textures/items/netherite_scrap' }
+        { id: 'netherite_scrap', price: 180, tex: 'textures/items/netherite_scrap' },
+        { id: 'obsidian', price: 25, tex: 'textures/blocks/obsidian' }
     ],
     
     Enchant: [
@@ -514,7 +513,18 @@ const itemListBuy = {
         price: 150,
         tex: 'textures/items/book_enchanted',
         enchant: { id: 'mending', level: 1 }
-    }]
+    },
+    {
+        name: 'Silk Touch',
+        id: 'enchanted_book',
+        price: 175,
+        tex: 'textures/items/book_enchanted',
+        enchant: { id: 'silk_touch', level: 1 }
+    }],
+    Miscellaneous: [
+        { id: 'totem_of_undying', price: 145, tex: 'textures/items/totem' },
+        { id: 'experience_bottle', price: 15, tex: 'textures/items/experience_bottle' }
+    ]
 }
 
 
@@ -534,7 +544,8 @@ const itemListSell = {
         { id: 'diamond', price: 25, tex: 'textures/items/diamond' },
         { id: 'emerald', price: 22, tex: 'textures/items/emerald' },
         { id: 'echo_shard', price: 35, tex: 'textures/items/echo_shard' },
-        { id: 'nether_star', price: 150, tex: 'textures/items/nether_star' }
+        { id: 'nether_star', price: 100, tex: 'textures/items/nether_star' },
+        { id: 'obsidian', price: 20, tex: 'textures/blocks/obsidian' }
     ],
     
     Farming: [
@@ -551,7 +562,7 @@ const itemListSell = {
     Food: [
     {
         id: 'honey_bottle',
-        price: 8,
+        price: 4,
         tex: 'textures/items/honey_bottle'
     }],
     
