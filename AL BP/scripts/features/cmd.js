@@ -1,4 +1,4 @@
-import { world, system } from '@minecraft/server'
+import { world, system, Player } from '@minecraft/server'
 import Score from '../extension/Score'
 import { PlayerDatabase } from '../extension/Database'
 import { npcShopMenu, summonNpc } from './npc'
@@ -14,20 +14,49 @@ import { scoreboardSet } from './scoreboard';
 import { sendMoney } from './money';
 import { tpaCommand, tpAcceptCommand, tpDenyCommand } from './tpa'
 
+
+
+system.beforeEvents.startup.subscribe(({ customCommandRegistry }) => {
+    customCommandRegistry.registerCommand(
+        {
+            name: 'as:add',
+            description: 'Add score to objectives',
+            permissionLevel: 1,
+            optionalParameters: [
+                {
+                    name: 'objectives',
+                    type: 'string'
+                },
+                {
+                    name: 'value',
+                    type: 'int'
+                }
+            ]
+        }, (origin, { objective, value }) => {
+            const player = origin.sourceEntity
+            if (!(player instanceof Player)) return;
+            Score.add(player, objective, value)
+        }
+    )
+})
+
+
+
+
 world.beforeEvents.chatSend.subscribe(ev => {
     const player = ev.sender
     const msg = ev.message.trim()
     const prefix = getData(player).chatPrefix.get() ?? '!'
-    
+
     if (!msg.startsWith(prefix)) return
-    
+
     ev.cancel = true
-    
+
     const args = msg.slice(prefix.length).trim().split(/\s+/)
     const cmd = args.shift()?.toLowerCase()
-    
+
     if (!cmd) return
-    
+
     switch (cmd) {
         case 'add':
             if (!isAdmin(player)) return noAdmin(player)
