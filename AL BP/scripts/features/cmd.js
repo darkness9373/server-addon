@@ -1,4 +1,4 @@
-import { world, system, Player } from '@minecraft/server'
+import { world, system, Player, CustomCommandParamType } from '@minecraft/server'
 import Score from '../extension/Score'
 import { PlayerDatabase } from '../extension/Database'
 import { npcShopMenu, summonNpc } from './npc'
@@ -17,21 +17,28 @@ import { tpaCommand, tpAcceptCommand, tpDenyCommand } from './tpa'
 
 
 system.beforeEvents.startup.subscribe(({ customCommandRegistry }) => {
+    customCommandRegistry.registerEnum(
+        'objectives',
+        ['money', 'killMob', 'killMonster']
+    )
+
     customCommandRegistry.registerCommand(
         {
             name: 'as:add',
             description: 'Add score to objectives',
             permissionLevel: 1,
-            optionalParameters: [
+            mandatoryParameters: [
                 {
                     name: 'objectives',
-                    type: 'string'
+                    type: CustomCommandParamType.Enum,
+                    enumName: 'objective'
                 },
                 {
                     name: 'value',
-                    type: 'int'
+                    type: CustomCommandParamType.Integer
                 }
-            ]
+            ],
+            cheatsRequired
         }, (origin, { objective, value }) => {
             const player = origin.sourceEntity
             if (!(player instanceof Player)) return;
