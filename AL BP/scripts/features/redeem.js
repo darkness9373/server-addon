@@ -97,7 +97,7 @@ export function claimRedeem(player) {
     // GIVE ITEMS
     for (const rwd of data.rewards) {
       try {
-        const item = new ItemStack(rwd.item, rwd.amount)
+        const item = new ItemStack(normalizeId(rwd.item), rwd.amount)
         giveItemSafe(player, item)
       } catch {
         player.sendMessage(text(`Item tidak valid: ${rwd.item}`).System.fail)
@@ -121,7 +121,9 @@ export function claimRedeem(player) {
 
 
 
-
+function normalizeId(id) {
+  return id.includes(':') ? id : `minecraft:${id}`
+}
 
 
 function normalizeCode(code) {

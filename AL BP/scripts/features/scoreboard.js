@@ -3,6 +3,31 @@ import { PlayerDatabase } from '../extension/Database'
 import Score from '../extension/Score'
 import Extra from '../extension/Extra'
 import { playtime } from './timeplayed'
+import { ModalFormData } from '@minecraft/server-ui';
+import OpenUI from '../extension/OpenUI'
+import { text } from '../config/text';
+
+
+export function scoreboardSet(player) {
+    const form = new ModalFormData()
+    form.title('Scoreboard Setup')
+    form.toggle('Enable Scoreboard')
+    OpenUI.force(player, form).then(async r => {
+        if (r.canceled) return;
+        const [ tog ] = r.formValues
+        if (tog === true) {
+            const scr = new PlayerDatabase('Scoreboard', player)
+            scr.set(true)
+            player.sendMessage(text(`Scoreboard diaktifkan!!`).System.succ)
+        } else {
+            const scr = new PlayerDatabase('Scoreboard', player)
+            scr.set(false)
+            player.sendMessage(text(`Scoreboard dinonaktifkan!!`).System.fail)
+            player.onScreenDisplay.setTitle('')
+        }
+    })
+}
+
 
 /* =========================
    PLACEHOLDER ENGINE
@@ -58,7 +83,8 @@ system.runInterval(() => {
             BLANK: ' ',
             BREAK: runLine()
         }]
-        
+        const scr = new PlayerDatabase('Scoreboard', player).get() ?? true;
+        if (scr === false) return;
         player.onScreenDisplay.setTitle(
             getPlaceholder(board.Line.join('\n'), data)
         )

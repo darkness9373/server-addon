@@ -226,31 +226,33 @@ function buyItemsConfirm(player, id, price, amount, category, name) {
                         const items = itemListBuy[category]
                         for (const item of items) {
                             if (item.name === name) {
-                                const itm = new ItemStack(normalizeId(id), amount)
-                                itm.setLore([
+                                
+                                const book = new ItemStack('minecraft:enchanted_book', 1)
+                                book.setLore([
                                     '§0[ENCHANT]',
                                     `§7${item.enchant.id} ${item.enchant.level}`
                                 ])
-                                const inv = player.getComponent('inventory').container;
-                                if (!hasEmptySlot(inv)) {
-                                    player.dimension.spawnItem(itm, player.location)
-                                    player.sendMessage(text(`Inventory kamu penuh, item akan di-drop ke tanah`).System.warn)
-                                    Score.remove(player, 'money', price)
-                                    return;
-                                }
-                                inv.addItem(itm)
-                                player.sendMessage(text(`Kamu berhasil membeli ${amount} ${name} dengan harga ${price} Coins`).System.succ)
+                                
+                                giveItemSafely(player, book, amount)
+                                
                                 Score.remove(player, 'money', price)
+                                player.sendMessage(
+                                    text(`Kamu berhasil membeli ${amount} ${name} dengan harga ${price} Coins`).System.succ
+                                )
+                                return;
                             }
                         }
                     } catch (e) {
                         throw new Error(e)
                     }
                 } else {
-                    let item = new ItemStack(normalizeId(id), amount)
-                    player.getComponent(EntityComponentTypes.Inventory).container.addItem(item)
-                    player.sendMessage(text(`Kamu berhasil membeli ${amount} ${Extra.formatName(id)} dengan harga ${price} Coins.`).System.succ)
+                    const item = new ItemStack(normalizeId(id), 1)
+                    giveItemSafely(player, item, amount)
+                    
                     Score.remove(player, 'money', price)
+                    player.sendMessage(
+                        text(`Kamu berhasil membeli ${amount} ${Extra.formatName(id)} dengan harga ${price} Coins.`).System.succ
+                    )
                 }
             }
         }
@@ -266,6 +268,43 @@ function hasEmptySlot(container) {
         if (!container.getItem(i)) return true;
     }
     return false;
+}
+
+function giveItemSafely(player, itemStack, amount) {
+    const inv = player.getComponent(EntityComponentTypes.Inventory).container;
+    
+    // item non-stackable (totem, enchanted book)
+    if (itemStack.maxAmount === 1) {
+        for (let i = 0; i < amount; i++) {
+            const one = itemStack.clone();
+            one.amount = 1;
+            
+            if (!hasEmptySlot(inv)) {
+                player.dimension.spawnItem(one, player.location);
+            } else {
+                inv.addItem(one);
+            }
+        }
+        return;
+    }
+    
+    // item stackable
+    let remaining = amount;
+    const maxStack = itemStack.maxAmount;
+    
+    while (remaining > 0) {
+        const give = Math.min(maxStack, remaining);
+        const stack = itemStack.clone();
+        stack.amount = give;
+        
+        if (!hasEmptySlot(inv)) {
+            player.dimension.spawnItem(stack, player.location);
+        } else {
+            inv.addItem(stack);
+        }
+        
+        remaining -= give;
+    }
 }
 
 function sellItem(player) {
@@ -409,189 +448,105 @@ function removeItem(player, id, amount) {
 
 const itemListBuy = {
     Consumable: [
-    {
-        id: 'golden_carrot',
-        price: 25,
-        tex: 'textures/items/carrot_golden'
-    },
-    {
-        id: 'golden_apple',
-        price: 80,
-        tex: 'textures/items/apple_golden'
-    },
-    {
-        id: 'totem_of_undying',
-        price: 220,
-        tex: 'textures/items/totem'
-    }],
+        { id: 'bread', price: 2, tex: 'textures/items/bread' },
+        { id: 'baked_potato', price: 3, tex: 'textures/items/potato_baked' },
+        { id: 'cooked_beef', price: 5, tex: 'textures/items/beef_cooked' },
+        { id: 'cooked_porkchop', price: 5, tex: 'textures/items/porkchop_cooked' },
+        
+        { id: 'honey_bottle', price: 4, tex: 'textures/items/honey_bottle' },
+        { id: 'milk_bucket', price: 7, tex: 'textures/items/bucket_milk' },
+        
+        { id: 'golden_carrot', price: 10, tex: 'textures/items/carrot_golden' },
+        { id: 'golden_apple', price: 30, tex: 'textures/items/apple_golden' },
+        
+        { id: 'totem_of_undying', price: 145, tex: 'textures/items/totem' }
+    ],
     
     Material: [
-    {
-        id: 'netherite_scrap',
-        price: 180,
-        tex: 'textures/items/netherite_scrap'
-    }],
+        { id: 'iron_ingot', price: 20, tex: 'textures/items/iron_ingot' },
+        { id: 'gold_ingot', price: 24, tex: 'textures/items/gold_ingot' },
+        { id: 'quartz', price: 15, tex: 'textures/items/quartz' },
+        { id: 'redstone', price: 10, tex: 'textures/items/redstone_dust' },
+        { id: 'amethyst_shard', price: 25, tex: 'textures/items/amethyst_shard' },
+        { id: 'diamond', price: 70, tex: 'textures/items/diamond' },
+        { id: 'netherite_scrap', price: 180, tex: 'textures/items/netherite_scrap' }
+    ],
     
     Enchant: [
-    {
-        name: 'Fortune III',
-        id: 'enchanted_book',
-        price: 200,
-        tex: 'textures/items/book_enchanted',
-        enchant: {
-            id: 'fortune',
-            level: 3
-        }
-    },
-    {
-        name: 'Sharpness II',
-        id: 'enchanted_book',
-        price: 120,
-        tex: 'textures/items/book_enchanted',
-        enchant: {
-            id: 'sharpness',
-            level: 2
-        }
-    },
     {
         name: 'Efficiency III',
         id: 'enchanted_book',
         price: 150,
         tex: 'textures/items/book_enchanted',
-        enchant: {
-            id: 'efficiency',
-            level: 3
-        }
+        enchant: { id: 'efficiency', level: 3 }
     },
     {
         name: 'Unbreaking III',
         id: 'enchanted_book',
         price: 170,
         tex: 'textures/items/book_enchanted',
-        enchant: {
-            id: 'unbreaking',
-            level: 3
-        }
+        enchant: { id: 'unbreaking', level: 3 }
+    },
+    {
+        name: 'Sharpness II',
+        id: 'enchanted_book',
+        price: 120,
+        tex: 'textures/items/book_enchanted',
+        enchant: { id: 'sharpness', level: 2 }
     },
     {
         name: 'Protection III',
         id: 'enchanted_book',
         price: 160,
         tex: 'textures/items/book_enchanted',
-        enchant: {
-            id: 'protection',
-            level: 3
-        }
+        enchant: { id: 'protection', level: 3 }
+    },
+    {
+        name: 'Fortune III',
+        id: 'enchanted_book',
+        price: 200,
+        tex: 'textures/items/book_enchanted',
+        enchant: { id: 'fortune', level: 3 }
+    },
+    {
+        name: 'Mending',
+        id: 'enchanted_book',
+        price: 150,
+        tex: 'textures/items/book_enchanted',
+        enchant: { id: 'mending', level: 1 }
     }]
 }
 
 
 const itemListSell = {
     Mob_Drop: [
-    {
-        id: 'rotten_flesh',
-        price: 2,
-        tex: 'textures/items/rotten_flesh'
-    },
-    {
-        id: 'string',
-        price: 5,
-        tex: 'textures/items/string'
-    },
-    {
-        id: 'spider_eye',
-        price: 6,
-        tex: 'textures/items/spider_eye'
-    },
-    {
-        id: 'bone',
-        price: 4,
-        tex: 'textures/items/bone'
-    }],
+        { id: 'rotten_flesh', price: 2, tex: 'textures/items/rotten_flesh' },
+        { id: 'bone', price: 4, tex: 'textures/items/bone' },
+        { id: 'string', price: 5, tex: 'textures/items/string' },
+        { id: 'spider_eye', price: 6, tex: 'textures/items/spider_eye' }
+    ],
     
     Material: [
-    {
-        id: 'cc:pearl',
-        price: 12,
-        tex: 'textures/cc/animals/items/pearl'
-    },
-    {
-        id: 'copper_ingot',
-        price: 6,
-        tex: 'textures/items/copper_ingot'
-    },
-    {
-        id: 'iron_ingot',
-        price: 10,
-        tex: 'textures/items/iron_ingot'
-    },
-    {
-        id: 'gold_ingot',
-        price: 12,
-        tex: 'textures/items/gold_ingot'
-    },
-    {
-        id: 'amethyst_shard',
-        price: 15,
-        tex: 'textures/items/amethyst_shard'
-    },
-    {
-        id: 'diamond',
-        price: 25,
-        tex: 'textures/items/diamond'
-    },
-    {
-        id: 'emerald',
-        price: 22,
-        tex: 'textures/items/emerald'
-    },
-    {
-        id: 'echo_shard',
-        price: 35,
-        tex: 'textures/items/echo_shard'
-    },
-    {
-        id: 'nether_star',
-        price: 150,
-        tex: 'textures/items/nether_star'
-    }],
+        { id: 'copper_ingot', price: 6, tex: 'textures/items/copper_ingot' },
+        { id: 'iron_ingot', price: 10, tex: 'textures/items/iron_ingot' },
+        { id: 'gold_ingot', price: 12, tex: 'textures/items/gold_ingot' },
+        { id: 'amethyst_shard', price: 15, tex: 'textures/items/amethyst_shard' },
+        { id: 'diamond', price: 25, tex: 'textures/items/diamond' },
+        { id: 'emerald', price: 22, tex: 'textures/items/emerald' },
+        { id: 'echo_shard', price: 35, tex: 'textures/items/echo_shard' },
+        { id: 'nether_star', price: 150, tex: 'textures/items/nether_star' }
+    ],
     
     Farming: [
-    {
-        id: 'wheat',
-        price: 3,
-        tex: 'textures/items/wheat'
-    },
-    {
-        id: 'carrot',
-        price: 2,
-        tex: 'textures/items/carrot'
-    },
-    {
-        id: 'sugar_cane',
-        price: 3,
-        tex: 'textures/items/sugar_cane'
-    },
-    {
-        id: 'cc:corn',
-        price: 5,
-        tex: 'textures/cc/cooking/items/crops/corn'
-    },
-    {
-        id: 'cc:tomato',
-        price: 5,
-        tex: 'textures/cc/cooking/items/crops/tomato'
-    },
-    {
-        id: 'cc:banana',
-        price: 5,
-        tex: 'textures/cc/cooking/items/crops/banana'
-    },
-    {
-        id: 'cc:broccoli',
-        price: 5,
-        tex: 'textures/cc/cooking/items/crops/broccoli'
-    }],
+        { id: 'wheat', price: 3, tex: 'textures/items/wheat' },
+        { id: 'carrot', price: 2, tex: 'textures/items/carrot' },
+        { id: 'sugar_cane', price: 3, tex: 'textures/items/reeds' },
+        
+        { id: 'cc:corn', price: 5, tex: 'textures/cc/cooking/items/crops/corn' },
+        { id: 'cc:tomato', price: 5, tex: 'textures/cc/cooking/items/crops/tomato' },
+        { id: 'cc:banana', price: 5, tex: 'textures/cc/cooking/items/crops/banana' },
+        { id: 'cc:broccoli', price: 5, tex: 'textures/cc/cooking/items/crops/broccoli' }
+    ],
     
     Food: [
     {
@@ -601,9 +556,12 @@ const itemListSell = {
     }],
     
     Animal_Drop: [
-    {
-        id: 'leather',
-        price: 4,
-        tex: 'textures/items/leather'
-    }]
+        { id: 'feather', price: 2, tex: 'textures/items/feather' },
+        { id: 'leather', price: 3, tex: 'textures/items/leather' },
+        { id: 'rabbit_foot', price: 8, tex: 'textures/items/rabbit_foot' },
+        
+        { id: 'cc:deer_antler', price: 10, tex: 'textures/cc/animals/items/deer.antler' },
+        { id: 'cc:shark_tooth', price: 30, tex: 'textures/cc/animals/items/shark.tooth' },
+        { id: 'cc:scorpion_tail', price: 35, tex: 'textures/cc/animals/items/scorpion_tail' }
+    ]
 }

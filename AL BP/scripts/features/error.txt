@@ -1,0 +1,97 @@
+[UI][error]-----------------------------------------------------
+Unknown properties found in def[hud_title_text] from namespace[hud]
+- Unknown property [orientation]
+----------------------------------------------------
+
+
+[Scripting][error]-Unhandled promise rejection: TypeError: Native variant type conversion failed. Function argument [0] expected type: string | RawMessage | (string | RawMessage)[]    at sendRequest (features/tpa.js:97)
+    at <anonymous> (features/tpa.js:62)
+
+
+[Scripting][error]-Unhandled promise rejection: TypeError: Native variant type conversion failed. Function argument [0] expected type: string | RawMessage | (string | RawMessage)[]    at sendRequest (features/tpa.js:97)
+    at <anonymous> (features/tpa.js:62)
+
+
+[Scripting][error]-TypeError: Native variant type conversion failed. Function argument [0] expected type: string | RawMessage | (string | RawMessage)[]    at accept (features/tpa.js:141)
+    at tpAcceptCommand (features/tpa.js:113)
+    at <anonymous> (features/cmd.js)
+
+
+[Scripting][error]-Unhandled promise rejection: TypeError: Native variant type conversion failed. Function argument [0] expected type: string | RawMessage | (string | RawMessage)[]    at sendRequest (features/tpa.js:97)
+    at <anonymous> (features/tpa.js:62)
+
+
+[Scripting][error]-TypeError: Native variant type conversion failed. Function argument [0] expected type: string | RawMessage | (string | RawMessage)[]    at accept (features/tpa.js:141)
+    at tpAcceptCommand (features/tpa.js:113)
+    at <anonymous> (features/cmd.js)
+
+
+[Scripting][error]-Unhandled promise rejection: TypeError: Native variant type conversion failed. Function argument [0] expected type: string | RawMessage | (string | RawMessage)[]    at sendRequest (features/tpa.js:97)
+    at <anonymous> (features/tpa.js:62)
+
+
+[Scripting][error]-TypeError: Native variant type conversion failed. Function argument [0] expected type: string | RawMessage | (string | RawMessage)[]    at accept (features/tpa.js:141)
+    at tpAcceptCommand (features/tpa.js:113)
+    at <anonymous> (features/cmd.js)
+
+
+[Scripting][error]-Unhandled promise rejection: TypeError: Native variant type conversion failed. Function argument [0] expected type: string | RawMessage | (string | RawMessage)[]    at sendRequest (features/tpa.js:97)
+    at <anonymous> (features/tpa.js:62)
+
+
+[Scripting][error]-TypeError: Native variant type conversion failed. Function argument [0] expected type: string | RawMessage | (string | RawMessage)[]    at accept (features/tpa.js:141)
+    at tpAcceptCommand (features/tpa.js:113)
+    at <anonymous> (features/cmd.js)
+
+
+[Scripting][error]-TypeError: Native variant type conversion failed. Function argument [0] expected type: string | RawMessage | (string | RawMessage)[]    at deny (features/tpa.js:187)
+    at tpDenyCommand (features/tpa.js:163)
+    at <anonymous> (features/cmd.js)
+
+
+[Scripting][error]-Unhandled promise rejection: TypeError: Native variant type conversion failed. Function argument [0] expected type: string | RawMessage | (string | RawMessage)[]    at sendRequest (features/tpa.js:97)
+    at <anonymous> (features/tpa.js:62)
+
+
+[Scripting][error]-TypeError: Native variant type conversion failed. Function argument [0] expected type: string | RawMessage | (string | RawMessage)[]    at accept (features/tpa.js:141)
+    at tpAcceptCommand (features/tpa.js:113)
+    at <anonymous> (features/cmd.js)
+
+
+[Scripting][error]-LocationOutOfWorldBoundariesError: Trying to access location (-34.0, -104.0, -1.0) which is outside of the world boundaries.    at findGravestoneLocation (features/grave.js:22)
+    at <anonymous> (features/grave.js:262)
+
+
+[Scripting][error]-TypeError: cannot read property 'container' of undefined    at <anonymous> (features/npcSet.js:8)
+
+
+[Scripting][error]-TypeError: cannot read property 'container' of undefined    at <anonymous> (features/npcSet.js:8)
+
+
+[Scripting][error]-TypeError: cannot read property 'container' of undefined    at <anonymous> (features/npcSet.js:8)
+
+
+[Scripting][error]-TypeError: cannot read property 'container' of undefined    at <anonymous> (features/npcSet.js:8)
+
+
+[Scripting][error]-TypeError: cannot read property 'container' of undefined    at <anonymous> (features/npcSet.js:8)
+
+
+[Scripting][error]-TypeError: cannot read property 'container' of undefined    at <anonymous> (features/npcSet.js:8)
+
+
+[Scripting][error]-TypeError: cannot read property 'container' of undefined    at <anonymous> (features/npcSet.js:8)
+
+
+[Scripting][error]-TypeError: cannot read property 'container' of undefined    at <anonymous> (features/npcSet.js:8)
+
+
+[Scripting][error]-TypeError: cannot read property 'container' of undefined    at <anonymous> (features/npcSet.js:8)
+
+
+[Scripting][error]-TypeError: cannot read property 'container' of undefined    at <anonymous> (features/npcSet.js:8)
+
+
+[Scripting][error]-TypeError: cannot read property 'container' of undefined    at <anonymous> (features/npcSet.js:8)
+
+

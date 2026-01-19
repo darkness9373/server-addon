@@ -1,5 +1,8 @@
 import { world, system } from '@minecraft/server'
 import Score from '../extension/Score'
+import { ModalFormData } from '@minecraft/server-ui';
+import OpenUI from '../extension/OpenUI';
+import { text } from '../config/text';
 
 /**
  * Minimum perubahan money agar ditampilkan
@@ -48,3 +51,74 @@ system.run(function tick() {
         Score.set(player, 'moneyRaw', money)
     }
 })
+
+
+export function sendMoney(player) {
+    const players = world.getAllPlayers()
+    const names = players.map(p => p.name)
+    
+    if (names.length <= 1) {
+        return player.sendMessage(
+            text('Tidak ada player lain yang online').System.fail
+        )
+    }
+    
+    const form = new ModalFormData()
+        .title('Send Coins')
+        .dropdown('Select Player', names)
+        .textField('Isi nominal', 'ex: 1000')
+        .submitButton('Kirim')
+    
+    OpenUI.force(player, form).then(r => {
+        if (r.canceled) return
+        
+        const [select, moneyInput] = r.formValues
+        
+        /* ===== VALIDASI NOMINAL ===== */
+        const amount = Number(moneyInput)
+        if (!Number.isInteger(amount) || amount <= 0) {
+            return player.sendMessage(
+                text('Nominal harus berupa angka bulat positif').System.fail
+            )
+        }
+        
+        const targetName = names[select]
+        
+        if (targetName === player.name) {
+            return player.sendMessage(
+                text('Tidak bisa mengirim uang ke diri sendiri').System.fail
+            )
+        }
+        
+        const target = world.getAllPlayers().find(p => p.name === targetName)
+        if (!target) {
+            return player.sendMessage(
+                text('Player sudah tidak online').System.fail
+            )
+        }
+        
+        /* ===== SALDO ===== */
+        const senderMoney = Number(Score.get(player, 'money') ?? 0)
+        
+        if (senderMoney < amount) {
+            return player.sendMessage(
+                text('Coin kamu tidak mencukupi').System.fail
+            )
+        }
+        
+        /* ===== TRANSAKSI ===== */
+        Score.set(player, 'money', senderMoney - amount)
+        
+        const targetMoney = Number(Score.get(target, 'money') ?? 0)
+        Score.set(target, 'money', targetMoney + amount)
+        
+        /* ===== FEEDBACK ===== */
+        player.sendMessage(
+            text(`Kamu mengirim §e${amount}§a Coins ke §b${target.name}`).System.succ
+        )
+        
+        target.sendMessage(
+            text(`Kamu menerima §e${amount}§a Coins dari §b${player.name}`).System.succ
+        )
+    })
+}
