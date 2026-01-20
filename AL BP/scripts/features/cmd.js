@@ -1,4 +1,4 @@
-import { world, system, Player, CustomCommandParamType } from '@minecraft/server'
+import { world, system, Player, CustomCommandParamType, CommandPermissionLevel } from '@minecraft/server'
 import Score from '../extension/Score'
 import { PlayerDatabase } from '../extension/Database'
 import { npcShopMenu, summonNpc } from './npc'
@@ -11,14 +11,14 @@ import { foodPlayer } from './food'
 import { text } from '../config/text'
 import { checkpointCommand } from './last';
 import { scoreboardSet } from './scoreboard';
-import { sendMoney } from './money';
+import { sendMoney, addMoney } from './money';
 import { tpaCommand, tpAcceptCommand, tpDenyCommand } from './tpa'
 
 
 
 system.beforeEvents.startup.subscribe(({ customCommandRegistry }) => {
     customCommandRegistry.registerEnum(
-        'objectives',
+        'as:objectives',
         ['money', 'killMob', 'killMonster']
     )
 
@@ -26,23 +26,84 @@ system.beforeEvents.startup.subscribe(({ customCommandRegistry }) => {
         {
             name: 'as:add',
             description: 'Add score to objectives',
-            permissionLevel: 1,
+            permissionLevel: CommandPermissionLevel.Admin,
             mandatoryParameters: [
                 {
-                    name: 'objectives',
-                    type: CustomCommandParamType.Enum,
-                    enumName: 'objective'
+                    name: 'as:objectives',
+                    type: CustomCommandParamType.Enum
                 },
                 {
                     name: 'value',
                     type: CustomCommandParamType.Integer
                 }
             ],
-            cheatsRequired
-        }, (origin, { objective, value }) => {
+            cheatsRequired: true
+        }, (origin, objective, value) => {
             const player = origin.sourceEntity
             if (!(player instanceof Player)) return;
             Score.add(player, objective, value)
+        }
+    )
+    customCommandRegistry.registerCommand(
+        {
+            name: 'as:set',
+            description: 'Set objective value',
+            permissionLevel: CommandPermissionLevel.Admin,
+            cheatsRequired: true,
+            mandatoryParameters: [
+                {
+                    name: 'as:objectives',
+                    type: CustomCommandParamType.Enum
+                },
+                {
+                    name: 'value',
+                    type: CustomCommandParamType.Integer
+                }
+            ]
+        }, (origin, objective, value) => {
+            const player = origin.sourceEntity
+            if (!(player instanceof Player)) return;
+            Score.set(player, objective, value)
+        }
+    )
+    customCommandRegistry.registerCommand(
+        {
+            name: 'as:remove',
+            description: 'Remove score from objective',
+            permissionLevel: CommandPermissionLevel.Admin,
+            cheatsRequired: true,
+            mandatoryParameters: [
+                {
+                    name: 'as:objectives',
+                    type: CustomCommandParamType.Enum
+                },
+                {
+                    name: 'value',
+                    type: CustomCommandParamType.Integer
+                }
+            ]
+        }, (origin, objective, value) => {
+            const player = origin.sourceEntity
+            if (!(player instanceof Player)) return;
+            Score.remove(player, objective, value)
+        }
+    )
+    customCommandRegistry.registerCommand(
+        {
+            name: 'as:get',
+            description: 'Get a value from objectives',
+            permissionLevel: CommandPermissionLevel.Admin,
+            cheatsRequired: true,
+            mandatoryParameters: [
+                {
+                    name: 'as:objectives',
+                    type: CustomCommandParamType.Enum
+                }
+            ]
+        }, (origin, objective) => {
+            const player = origin.sourceEntity
+            if (!(player instanceof Player)) return;
+            player.sendMessage(text(`Objective\n > ${objective}\n > ${Score.get(player, objective)}`).System.deff)
         }
     )
 })

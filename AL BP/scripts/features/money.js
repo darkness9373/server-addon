@@ -1,6 +1,6 @@
 import { world, system } from '@minecraft/server'
 import Score from '../extension/Score'
-import { ModalFormData } from '@minecraft/server-ui';
+import { ModalFormData, ActionFormData } from '@minecraft/server-ui';
 import OpenUI from '../extension/OpenUI';
 import { text } from '../config/text';
 
