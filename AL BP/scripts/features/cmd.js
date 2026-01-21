@@ -106,6 +106,62 @@ system.beforeEvents.startup.subscribe(({ customCommandRegistry }) => {
             player.sendMessage(text(`Objective\n > ${objective}\n > ${Score.get(player, objective)}`).System.deff)
         }
     )
+    customCommandRegistry.registerCommand(
+        {
+            name: 'as:shop',
+            description: 'Open the shop',
+            permissionLevel: CommandPermissionLevel.Any,
+            cheatsRequired: true,
+        }, (origin) => {
+            const player = origin.sourceEntity
+            system.run(() => npcShopMenu(player))
+        }
+    )
+    customCommandRegistry.registerCommand(
+        {
+            name: 'as:spawnnpc',
+            description: 'Summon original or custom NPC',
+            permissionLevel: CommandPermissionLevel.Admin,
+            cheatsRequired: true,
+        }, (origin) => {
+            const player = origin.sourceEntity
+            system.run(() => summonNpc(player))
+        }
+    )
+    customCommandRegistry.registerCommand(
+        {
+            name: 'as:warp',
+            description: 'Open the system menu',
+            permissionLevel: CommandPermissionLevel.Any,
+            cheatsRequired: true,
+        }, (origin) => {
+            const player = origin.sourceEntity
+            system.run(() => warpUI(player))
+        }
+    )
+    customCommandRegistry.registerCommand(
+        {
+            name: 'as:mkredeem',
+            description: 'Open a form to create redeem code',
+            permissionLevel: CommandPermissionLevel.Admin,
+            cheatsRequired: true,
+        }, (origin) => {
+            const player = origin.sourceEntity
+            system.run(() => makeRedeem(player))
+        }
+    )
+    customCommandRegistry.registerCommand(
+        {
+            name: 'as:redeem',
+            description: 'Open form to insert redeem code',
+            permissionLevel: CommandPermissionLevel.Any,
+            cheatsRequired: true,
+        }, (origin) => {
+            const player = origin.sourceEntity
+            system.run(() => claimRedeem(player))
+        }
+    )
+    
 })
 
 
