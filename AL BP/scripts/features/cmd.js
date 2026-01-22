@@ -289,6 +289,19 @@ system.beforeEvents.startup.subscribe(({ customCommandRegistry }) => {
             system.run(() => sendMoney(player))
         }
     )
+    customCommandRegistry.registerCommand(
+        {
+            name: 'as:inspect',
+            description: 'Inspect information from a player',
+            cheatsRequired: true,
+            permissionLevel: CommandPermissionLevel.GameDirectors
+        }, (origin) => {
+            const player = origin.sourceEntity
+            system.run(() => {
+                return
+            })
+        }
+    )
 })
 
 /* ================= HELPER ================= */
