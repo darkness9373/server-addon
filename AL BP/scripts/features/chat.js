@@ -8,33 +8,7 @@ import { text } from '../config/text'
 
 const ADMIN_SECRET_CODE = 'ancient-admin-26' // GANTI SESUAI MAU KAMU
 
-/* ========================================== */
 
-world.beforeEvents.chatSend.subscribe(ev => {
-    const player = ev.sender
-    const msg = ev.message.trim()
-    const prefix = getData(player).chatPrefix.get() ?? '!'
-    
-    /* ====== COMMAND DISERAHKAN KE CMD SYSTEM ====== */
-    if (msg.startsWith(prefix)) return
-    
-    ev.cancel = true
-    
-    /* ============ ADMIN SECRET ============ */
-    if (msg === `${ADMIN_SECRET_CODE}`) {
-        
-        
-        
-        // Optional: sekali pakai per player
-        
-        
-        
-    }
-    
-    /* ============ CHAT NORMAL ============ */
-    const rank = getData(player).rank.get() ?? 'Newbie'
-    world.sendMessage(`§7[${rank}] §f${player.name} §8» §r${msg}`)
-})
 
 world.beforeEvents.chatSend.subscribe(data => {
     const player = data.sender
@@ -60,8 +34,12 @@ world.beforeEvents.chatSend.subscribe(data => {
             text('Akses Admin berhasil diaktifkan').System.succ
         )
     }
-    const color = RANK_COLOR[rank] ?? RANK_COLOR.Default
     const rank = getData(player).rank.get() ?? 'Newbie'
+    if (player.hasTag('admin')) {
+        world.sendMessage(`§l§e[ADMIN] §r${player.name} §8» §r${msg}`)
+        return;
+    }
+    const color = RANK_COLOR[rank] ?? RANK_COLOR.Default
     world.sendMessage(`§l${color}[${rank.toUpperCase()}] §r${player.name} §8» §r${msg}`)
 })
 

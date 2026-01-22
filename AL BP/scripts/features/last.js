@@ -61,7 +61,7 @@ function showCheckpointForm(player) {
     OpenUI.force(player, form).then(r => {
         if (r.canceled || r.selection === 1) {
             player.sendMessage(
-                text('Gunakan §6!checkpoint §6untuk kembali kapan saja.').System.warn
+                text('Gunakan §6/checkpoint §6untuk kembali kapan saja.').System.warn
             )
             return
         }

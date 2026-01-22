@@ -26,7 +26,7 @@ export function foodPlayer(player) {
   const cooldown = FOOD_COOLDOWN[rankLevel]
   if (!cooldown) {
     return player.sendMessage(
-      text('Rank kamu belum bisa menggunakan §6!food').System.fail
+      text('Rank kamu belum bisa menggunakan §6/food').System.fail
     )
   }
   

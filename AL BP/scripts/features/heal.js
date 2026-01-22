@@ -24,7 +24,7 @@ export function healPlayer(player) {
   const cooldown = HEAL_COOLDOWN[rankLevel]
   if (!cooldown) {
     return player.sendMessage(
-      text('Rank kamu saat ini belum bisa menggunakan §6!heal').System.fail
+      text('Rank kamu saat ini belum bisa menggunakan §6/heal').System.fail
     )
   }
   

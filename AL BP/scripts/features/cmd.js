@@ -11,7 +11,7 @@ import { foodPlayer } from './food'
 import { text } from '../config/text'
 import { checkpointCommand } from './last';
 import { scoreboardSet } from './scoreboard';
-import { sendMoney, addMoney } from './money';
+import { sendMoney } from './money';
 import { tpaCommand, tpAcceptCommand, tpDenyCommand } from './tpa'
 
 
@@ -19,14 +19,17 @@ import { tpaCommand, tpAcceptCommand, tpDenyCommand } from './tpa'
 system.beforeEvents.startup.subscribe(({ customCommandRegistry }) => {
     customCommandRegistry.registerEnum(
         'as:objectives',
-        ['money', 'killMob', 'killMonster']
+        ['money', 'killMob', 'killMonster', 'timePlayed']
     )
-
+    customCommandRegistry.registerEnum(
+        'as:scoreboard',
+        ['show', 'hide']
+    )
     customCommandRegistry.registerCommand(
         {
             name: 'as:add',
             description: 'Add score to objectives',
-            permissionLevel: CommandPermissionLevel.Admin,
+            permissionLevel: CommandPermissionLevel.GameDirectors,
             mandatoryParameters: [
                 {
                     name: 'as:objectives',
@@ -48,7 +51,7 @@ system.beforeEvents.startup.subscribe(({ customCommandRegistry }) => {
         {
             name: 'as:set',
             description: 'Set objective value',
-            permissionLevel: CommandPermissionLevel.Admin,
+            permissionLevel: CommandPermissionLevel.GameDirectors,
             cheatsRequired: true,
             mandatoryParameters: [
                 {
@@ -70,7 +73,7 @@ system.beforeEvents.startup.subscribe(({ customCommandRegistry }) => {
         {
             name: 'as:remove',
             description: 'Remove score from objective',
-            permissionLevel: CommandPermissionLevel.Admin,
+            permissionLevel: CommandPermissionLevel.GameDirectors,
             cheatsRequired: true,
             mandatoryParameters: [
                 {
@@ -92,7 +95,7 @@ system.beforeEvents.startup.subscribe(({ customCommandRegistry }) => {
         {
             name: 'as:get',
             description: 'Get a value from objectives',
-            permissionLevel: CommandPermissionLevel.Admin,
+            permissionLevel: CommandPermissionLevel.GameDirectors,
             cheatsRequired: true,
             mandatoryParameters: [
                 {
@@ -111,7 +114,7 @@ system.beforeEvents.startup.subscribe(({ customCommandRegistry }) => {
             name: 'as:shop',
             description: 'Open the shop',
             permissionLevel: CommandPermissionLevel.Any,
-            cheatsRequired: true,
+            cheatsRequired: true
         }, (origin) => {
             const player = origin.sourceEntity
             system.run(() => npcShopMenu(player))
@@ -121,8 +124,8 @@ system.beforeEvents.startup.subscribe(({ customCommandRegistry }) => {
         {
             name: 'as:spawnnpc',
             description: 'Summon original or custom NPC',
-            permissionLevel: CommandPermissionLevel.Admin,
-            cheatsRequired: true,
+            permissionLevel: CommandPermissionLevel.GameDirectors,
+            cheatsRequired: true
         }, (origin) => {
             const player = origin.sourceEntity
             system.run(() => summonNpc(player))
@@ -133,7 +136,7 @@ system.beforeEvents.startup.subscribe(({ customCommandRegistry }) => {
             name: 'as:warp',
             description: 'Open the system menu',
             permissionLevel: CommandPermissionLevel.Any,
-            cheatsRequired: true,
+            cheatsRequired: true
         }, (origin) => {
             const player = origin.sourceEntity
             system.run(() => warpUI(player))
@@ -143,8 +146,8 @@ system.beforeEvents.startup.subscribe(({ customCommandRegistry }) => {
         {
             name: 'as:mkredeem',
             description: 'Open a form to create redeem code',
-            permissionLevel: CommandPermissionLevel.Admin,
-            cheatsRequired: true,
+            permissionLevel: CommandPermissionLevel.GameDirectors,
+            cheatsRequired: true
         }, (origin) => {
             const player = origin.sourceEntity
             system.run(() => makeRedeem(player))
@@ -155,106 +158,137 @@ system.beforeEvents.startup.subscribe(({ customCommandRegistry }) => {
             name: 'as:redeem',
             description: 'Open form to insert redeem code',
             permissionLevel: CommandPermissionLevel.Any,
-            cheatsRequired: true,
+            cheatsRequired: true
         }, (origin) => {
             const player = origin.sourceEntity
             system.run(() => claimRedeem(player))
         }
     )
-    
-})
-
-
-
-
-world.beforeEvents.chatSend.subscribe(ev => {
-    const player = ev.sender
-    const msg = ev.message.trim()
-    const prefix = getData(player).chatPrefix.get() ?? '!'
-
-    if (!msg.startsWith(prefix)) return
-
-    ev.cancel = true
-
-    const args = msg.slice(prefix.length).trim().split(/\s+/)
-    const cmd = args.shift()?.toLowerCase()
-
-    if (!cmd) return
-
-    switch (cmd) {
-        case 'add':
-            if (!isAdmin(player)) return noAdmin(player)
-            Score.add(player, args[0], Number(args[1]))
-            break
-        case 'set':
-            if (!isAdmin(player)) return noAdmin(player)
-            Score.set(player, args[0], Number(args[1]))
-            break
-        case 'remove':
-            if (!isAdmin(player)) return noAdmin(player)
-            Score.remove(player, args[0], Number(args[1]))
-            break
-        case 'get':
-            if (!isAdmin(player)) return noAdmin(player)
-            player.sendMessage(String(Score.get(player, args[0])))
-            break
-        case 'shop':
-            system.run(() => npcShopMenu(player))
-            break
-        case 'spawnnpc':
-            if (!isAdmin(player)) return noAdmin(player)
-            system.run(() => summonNpc(player))
-            break
-        case 'warp':
-            system.run(() => warpUI(player))
-            break
-        case 'mkredeem':
-            if (!isAdmin(player)) return noAdmin(player)
-            system.run(() => makeRedeem(player))
-            break
-        case 'redeem':
-            system.run(() => claimRedeem(player))
-            break
-        case 'addrank':
-            if (!isAdmin(player)) return noAdmin(player)
+    customCommandRegistry.registerCommand(
+        {
+            name: 'as:addrank',
+            description: 'Add Rank to a specific player',
+            permissionLevel: CommandPermissionLevel.GameDirectors,
+            cheatsRequired: true
+        }, (origin) => {
+            const player = origin.sourceEntity
             system.run(() => addRankForm(player))
-            break
-        case 'heal':
+        }
+    )
+    customCommandRegistry.registerCommand(
+        {
+            name: 'as:heal',
+            description: 'Restores 100% health instantly',
+            permissionLevel: CommandPermissionLevel.Any,
+            cheatsRequired: true
+        }, (origin) => {
+            const player = origin.sourceEntity
             system.run(() => healPlayer(player))
-            break
-        case 'food':
+        }
+    )
+    customCommandRegistry.registerCommand(
+        {
+            name: 'as:food',
+            description: 'Instantly restores 100% hunger',
+            permissionLevel: CommandPermissionLevel.Any,
+            cheatsRequired: true
+        }, (origin) => {
+            const player = origin.sourceEntity
             system.run(() => foodPlayer(player))
-            break
-        case 'setrank':
-            system.run(() => {
-                setRank(player)
-            })
-            break
-        case 'checkpoint':
-            system.run(() => checkpointCommand(player))
-            break;
-        case 'board':
-            system.run(() => scoreboardSet(player))
-            break;
-        case 'sendcoin':
-            system.run(() => sendMoney(player))
-            break;
-        case 'tpa':
-            system.run(() => tpaCommand(player, args))
-            break
-        case 'tpaccept':
+        }
+    )
+    customCommandRegistry.registerCommand(
+        {
+            name: 'as:tpa',
+            description: 'Request teleport to a random player',
+            permissionLevel: CommandPermissionLevel.Any,
+            cheatsRequired: true
+        }, (origin) => {
+            const player = origin.sourceEntity
+            system.run(() => tpaCommand(player))
+        }
+    )
+    customCommandRegistry.registerCommand(
+        {
+            name: 'as:tpaccept',
+            description: 'Open form to insert redeem code',
+            permissionLevel: CommandPermissionLevel.Any,
+            cheatsRequired: true
+        }, (origin) => {
+            const player = origin.sourceEntity
             system.run(() => tpAcceptCommand(player))
-            break
-        case 'tpadeny':
+        }
+    )
+    customCommandRegistry.registerCommand(
+        {
+            name: 'as:tpdeny',
+            description: 'Open form to insert redeem code',
+            permissionLevel: CommandPermissionLevel.Any,
+            cheatsRequired: true
+        }, (origin) => {
+            const player = origin.sourceEntity
             system.run(() => tpDenyCommand(player))
-            break
-        default:
-            player.sendMessage(
-                text(`Command >${cmd}< tidak terdaftar`).System.fail
-            )
-            system.run(() => player.playSound('note.bass'))
-            break
-    }
+        }
+    )
+    customCommandRegistry.registerCommand(
+        {
+            name: 'as:setrank',
+            description: 'Set rank you have to be displayed',
+            permissionLevel: CommandPermissionLevel.Any,
+            cheatsRequired: true
+        }, (origin) => {
+            const player = origin.sourceEntity
+            system.run(() => setRank(player))
+        }
+    )
+    customCommandRegistry.registerCommand(
+        {
+            name: 'as:checkpoint',
+            description: 'Teleport to the last place before going offline',
+            permissionLevel: CommandPermissionLevel.Any,
+            cheatsRequired: true
+        }, (origin) => {
+            const player = origin.sourceEntity
+            system.run(() => checkpointCommand(player))
+        }
+    )
+    customCommandRegistry.registerCommand(
+        {
+            name: 'as:board',
+            description: 'Show or hide scoreboard',
+            permissionLevel: CommandPermissionLevel.Any,
+            cheatsRequired: true,
+            optionalParameters: [
+                {
+                    name: 'as:scoreboard',
+                    type: CustomCommandParamType.Enum
+                }
+            ]
+        }, (origin, show) => {
+            const player = origin.sourceEntity
+            const val = show === 'show' ? true : false
+            const score = new PlayerDatabase('Scoreboard', player)
+            if (val === true) {
+                score.set(true)
+                player.sendMessage(text(`Scoreboard diaktifkan!!`).System.succ)
+            } else {
+                score.set(false)
+                player.sendMessage(text(`Scoreboard dinonaktifkan!!`).System.fail)
+                player.onScreenDisplay.setTitle('')
+            }
+        }
+    )
+    customCommandRegistry.registerCommand(
+        {
+            name: 'as:sendcoin',
+            description: 'Send coin you have to other players',
+            permissionLevel: CommandPermissionLevel.Any,
+            cheatsRequired: true,
+        }, (origin) => {
+            const player = origin.sourceEntity
+            system.run(() => sendMoney(player))
+        }
+    )
 })
 
 /* ================= HELPER ================= */

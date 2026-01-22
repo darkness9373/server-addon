@@ -26,22 +26,7 @@ function getOnlinePlayers(except) {
 
 /* ================= SEND TPA ================= */
 
-export function tpaCommand(player, args) {
-  
-  // !tpa <name>
-  if (args.length > 0) {
-    const target = world.getPlayers().find(
-      p => p.name.toLowerCase() === args[0].toLowerCase()
-    )
-    
-    if (!target) {
-      player.sendMessage(text('Player tidak ditemukan').System.fail)
-      return
-    }
-    
-    return sendRequest(player, target)
-  }
-  
+export function tpaCommand(player) {
   // !tpa → form
   const players = getOnlinePlayers(player)
   if (players.length === 0) {
@@ -92,7 +77,7 @@ function sendRequest(sender, target) {
   target.sendMessage(
     text(
       `§e${sender.name} §ringin TPA ke kamu\n` +
-      `Gunakan §a!tpaccept §ratau §c!tpadeny`
+      `Gunakan §a/tpaccept §ratau §c/tpadeny`
     ).System.deff
   )
 }

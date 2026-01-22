@@ -185,6 +185,15 @@ world.beforeEvents.playerBreakBlock.subscribe(async data => {
             dim.spawnItem(item, player.location)
         }
     }
+    const storedXP = grave.getDynamicProperty('stored_xp') ?? 0
+    
+    if (storedXP > 0) {
+        player.addLevels(storedXP)
+    }
+    player.playSound('random.levelup')
+    player.sendMessage(
+        text(`XP dikembalikan: §a+${storedXP}`).System.succ
+    )
     
     /* === HAPUS GRAVESTONE === */
     block.setPermutation(BlockPermutation.resolve('minecraft:air'))
@@ -253,6 +262,15 @@ world.beforeEvents.playerInteractWithBlock.subscribe(async data => {
             dim.spawnItem(item, player.location)
         }
     }
+    const storedXP = grave.getDynamicProperty('stored_xp') ?? 0
+    
+    if (storedXP > 0) {
+        player.addLevels(storedXP)
+    }
+    player.playSound('random.levelup')
+    player.sendMessage(
+        text(`XP dikembalikan: §a+${storedXP}`).System.succ
+    )
     
     /* === HAPUS GRAVESTONE === */
     block.setPermutation(BlockPermutation.resolve('minecraft:air'))
@@ -359,6 +377,10 @@ world.afterEvents.entityDie.subscribe(data => {
     grave.nameTag = player.name
     grave.addTag('owner:' + player.id)
     
+    grave.setDynamicProperty(
+        'stored_xp',
+        Math.floor(player.level * 0.5) // simpan 50%
+    )
     /* === PINDAHKAN ITEM DROP === */
     const graveInv = grave.getComponent('inventory').container
     const near = dim.getEntities({
