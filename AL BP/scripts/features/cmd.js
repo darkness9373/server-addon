@@ -13,6 +13,7 @@ import { checkpointCommand } from './last';
 import { scoreboardSet } from './scoreboard';
 import { sendMoney } from './money';
 import { tpaCommand, tpAcceptCommand, tpDenyCommand } from './tpa'
+import { inspectMenu } from './inspect';
 
 
 
@@ -287,6 +288,17 @@ system.beforeEvents.startup.subscribe(({ customCommandRegistry }) => {
         }, (origin) => {
             const player = origin.sourceEntity
             system.run(() => sendMoney(player))
+        }
+    )
+    customCommandRegistry.registerCommand(
+        {
+            name: 'as:inspect',
+            description: 'Inspecting the specified player data',
+            permissionLevel: CommandPermissionLevel.Any,
+            cheatsRequired: true,
+        }, (origin) => {
+            const player = origin.sourceEntity
+            system.run(() => inspectMenu(player))
         }
     )
 })
