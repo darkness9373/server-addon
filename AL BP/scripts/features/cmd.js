@@ -10,9 +10,9 @@ import { healPlayer } from './heal'
 import { foodPlayer } from './food'
 import { text } from '../config/text'
 import { checkpointCommand } from './last';
-import { scoreboardSet } from './scoreboard';
 import { sendMoney } from './money';
 import { tpaCommand, tpAcceptCommand, tpDenyCommand } from './tpa'
+import { inspectMenu } from './inspect';
 
 
 
@@ -292,14 +292,12 @@ system.beforeEvents.startup.subscribe(({ customCommandRegistry }) => {
     customCommandRegistry.registerCommand(
         {
             name: 'as:inspect',
-            description: 'Inspect information from a player',
+            description: 'Inspecting the specified player data',
+            permissionLevel: CommandPermissionLevel.Any,
             cheatsRequired: true,
-            permissionLevel: CommandPermissionLevel.GameDirectors
         }, (origin) => {
             const player = origin.sourceEntity
-            system.run(() => {
-                return
-            })
+            system.run(() => inspectMenu(player))
         }
     )
 })

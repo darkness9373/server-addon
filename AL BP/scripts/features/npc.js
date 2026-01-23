@@ -468,10 +468,11 @@ function matchId(item, id) {
 function removeItem(player, id, amount) {
     const inv = player.getComponent(EntityComponentTypes.Inventory).container;
     let remaining = amount;
+    const targetId = normalizeId(id)
     
     for (let i = 0; i < inv.size && remaining > 0; i++) {
         const item = inv.getItem(i);
-        if (!item || item.typeId !== 'minecraft:' + id) continue;
+        if (!item || item.typeId !== targetId) continue;
         
         if (item.amount <= remaining) {
             remaining -= item.amount;
